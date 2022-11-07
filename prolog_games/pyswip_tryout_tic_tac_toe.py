@@ -90,6 +90,10 @@ def get_next_player(current_player):
 
 
 def play():
+    """one playthrough
+    interaction with player through input
+    computer decides randomly by chance
+    """
     board = newBoard
     current_player = 'o'
     print("-------------TIC-TAC-TOE-------------\nThe Board looks like this:\n")
