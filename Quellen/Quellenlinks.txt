@@ -1,0 +1,8 @@
+Links für Publikationen der HHU:
+https://www.cs.hhu.de/lehrstuehle-und-arbeitsgruppen/softwaretechnik-und-programmiersprachen/publikationen
+
+The Art of Prolog 2nd Edition:
+https://mitpress.mit.edu/9780262691635/the-art-of-prolog/
+
+Ivan Bratko. Prolog Programming for Artificial Intelligence. Addison-Wesley, 4th edition, 2012 :
+https://books.google.de/books?hl=en&lr=&id=jezufm2Ly5YC&oi=fnd&pg=PR9&dq=Ivan+Bratko.+Prolog+Programming+for+Artificial+Intelligence.+Addison-Wesley,+4th+edition,+2012.&ots=e3ZJe0V0Wk&sig=Hj5K3tloOj_sfln-J2pYYlXxBRw&redir_esc=y#v=onepage&q&f=false
