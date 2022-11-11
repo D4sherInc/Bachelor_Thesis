@@ -1,0 +1,5 @@
+# ignored directories
+language_package
+open_spiel
+pyswip
+
