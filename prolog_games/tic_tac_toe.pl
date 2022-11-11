@@ -19,26 +19,23 @@ legal_moves([_|T], N, Tail) :-
 	legal_moves(T, M, Tail).
 
 wingame(Board, Player) :-
-    win_lines(Board, Player); win_columns(Board, Player); win_diagonal(Board, Player).
+    dif(Player, 0),
+    (win_lines(Board, Player); win_columns(Board, Player); win_diagonal(Board, Player)).
 
-win_lines([X,X,X|_], X) :-
-    \+ X == 0, !.
+win_lines([X,X,X|_], X) :- !.
 win_lines([_,_,_|Tail], X) :-
     win_lines(Tail, X).
 
-win_columns([X,_,_, X,_,_, X,_,_], X) :-
-    \+ X == 0, !.
-win_columns([_,X,_, _,X,_, _,X,_], X) :-
-    \+ X == 0 ,!.
-win_columns([_,_,X, _,_,X, _,_,X], X) :-
-    \+ X == 0.
+win_columns([X,_,_, X,_,_, X,_,_], X) :- !.
+win_columns([_,X,_, _,X,_, _,X,_], X) :- !.
+win_columns([_,_,X, _,_,X, _,_,X], X).
 
 win_diagonal([  X,_,_,
                 _,X,_,
-                _,_,X], X) :- \+ X == 0, !.
+                _,_,X], X) :- !.
 win_diagonal([  _,_,X,
                 _,X,_,
-                X,_,_], X) :- \+ X == 0.
+                X,_,_], X).
 
 display([A,B,C,D,E,F,G,H,I]) :-
 	format('~w~n~w~n~w~n', [[A,B,C], [D,E,F], [G,H,I]]).

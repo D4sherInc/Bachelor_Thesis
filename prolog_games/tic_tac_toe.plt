@@ -5,19 +5,19 @@
 :- begin_tests(tic_tac_toe_tests).
 
 test(legal_moves1_empty_board) :-
-    Board = [e,e,e,e,e,e,e,e,e],
+    Board = [0,0,0,0,0,0,0,0,0],
     legal_moves(Board, Moves),
     Moves = [1,2,3,4,5,6,7,8,9].
 
 test(legal_moves1_partially_played) :-
-    Board = [x,x,o,e,e,e,o,x,e],
+    Board = [x,x,o,0,0,0,o,x,0],
     legal_moves(Board, Moves),
     Moves = [4,5,6,9].
 
 test(win1_empty_fail, [fail]) :-
-    Board = [e,e,e,
-             e,e,e,
-             e,e,e],
+    Board = [0,0,0,
+             0,0,0,
+             0,0,0],
     wingame(Board, _Player).
 
 test(win2_fully_played, [fail]) :-
@@ -75,28 +75,28 @@ test(win10_diagonal, [nondet]) :-
     wingame(Board, x).
 
 test(move1_correct) :-
-    Board = [e,e,e,
-             e,e,e,
-             e,e,e],
+    Board = [0,0,0,
+             0,0,0,
+             0,0,0],
     Player = x,
     Move = 5,
     move(Board, Player, Move, NewBoard),
-    NewBoard = [e,e,e,
-                e,x,e,
-                e,e,e].
+    NewBoard = [0,0,0,
+                0,x,0,
+                0,0,0].
 
 test(move2_false, [fail]) :-
     Board = [x,o,x,
-             e,x,e,
-             o,e,o],
+             0,x,0,
+             o,0,o],
     Player = o,
     Move = 5,
     move(Board, Player, Move, _NewBoard).
 
 test(move3_false, [fail]) :-
     Board = [x,o,x,
-             e,x,e,
-             o,e,o],
+             0,x,0,
+             o,0,o],
     Player = x,
     Move = 5,
     move(Board, Player, Move, _NewBoard).
