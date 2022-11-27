@@ -17,6 +17,55 @@
 %	c  | 3/3  0/5
 %	d  | 5/0  1/1
 
+% all applicable methods:
+%   init (done)
+%   current_player (done)
+%   legal_actions (done)
+%   apply_action (done)
+%   action_to_string (optional, can be done in python)
+%   is_terminal
+%   returns
+
+% init(-InitState, -Current_Player, -player0_score)
+init(InitState, Current_Player, Player0_score) :-
+    Current_Player is 0,
+    Player0_score is 0,
+    % InitState = state(player(Current_Player, Player0_score, []), player(1, 0, []), continue).
+    % InitState = [P1, P1_score, P1_History, P2, P2_Score, P2_History, continue_or_end]
+    InitState = [0, 0, [], 1, 0, [], continue].
+
+% pyspiel constant: playerID.SIMULTANEOUS = -2
+current_player(-2).
+
+% legal actions, all moves always allowed
+% TODO: if not terminal
+legal_actions(  [0-cooperate, 1-cooperate],
+                [0-cooperate, 1-defect],
+                [0-defect, 1-cooperate],
+                [0-defect, 1-defect]).
+
+apply_action(GameState, Move,
+            [P1, NP1Score, NP1_History, P2, NP2Score, NP2_History, Continue_or_end]) :-
+%             state(player(P1, NP1Score, NP1_History), players(P2, NP2Score, NP2_History), Continue_or_end)) :-
+%    GameState = state(P1, P2, continue),
+%    P1 = player(P1, P1_Score, P1_History),
+%    P2 = player(P2, P2_Score, P2_History),
+    GameState = [P1, P1_Score, P1_History, P2, P2_Score, P2_History, continue],
+    Move = [P1-M1, P2-M2],
+    rewards(P1-M1, P2-M2, R1-R2),
+    !,
+    append(P1_History, M1, NP1_History),
+    append(P2_History, M2, NP2_History),
+    NP1Score is P1_Score + R1,
+    NP2Score is P2_Score + R2,
+    game_state(Continue_or_end).
+
+is_terminal([_,_,_,_,_,_,end]).
+
+% ------------------------------------------
+% actual game implementations
+
+
 % reward table
 % as rewards(player-action)
 rewards(0-cooperate, 1-cooperate, 3-3):- !.
