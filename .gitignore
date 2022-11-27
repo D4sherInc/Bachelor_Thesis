@@ -1,5 +1,18 @@
 # ignored directories
-language_package
-open_spiel
-pyswip
+open_spiel/
+pyswip/
+language_package/
+Latex_tutorial_material/
 
+# IDE
+.idea/
+
+# virtual environments
+venv/
+
+# Byte-compiled
+__pycache__/
+$py.class
+
+# quickdraw thoughts
+TODOs
