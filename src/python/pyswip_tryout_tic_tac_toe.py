@@ -3,7 +3,7 @@ from pyswip import Prolog
 import random
 
 prolog = Prolog()
-prolog.consult("tic_tac_toe.pl")
+prolog.consult("../prolog/tic_tac_toe.pl")
 
 _ = 0
 
