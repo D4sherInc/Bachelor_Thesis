@@ -18,10 +18,11 @@
 %	d  | 5/0  1/1
 
 % reward table
-rewards(prisoner1-cooperate, prisoner2-cooperate, 3-3):- !.
-rewards(prisoner1-cooperate, prisoner2-defect, 0-5):- !.
-rewards(prisoner1-defect, prisoner2-cooperate, 5-0):- !.
-rewards(prisoner1-defect, prisoner2-defect, 1-1):- !.
+% as rewards(player-action)
+rewards(0-cooperate, 1-cooperate, 3-3):- !.
+rewards(0-cooperate, 1-defect, 0-5):- !.
+rewards(0-defect, 1-cooperate, 5-0):- !.
+rewards(0-defect, 1-defect, 1-1):- !.
 
 % possible actions
 action(0, cooperate, c).
