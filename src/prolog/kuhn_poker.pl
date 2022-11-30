@@ -19,6 +19,38 @@
 % P1: manual player
 % P2: bot
 
+
+
+% all applicable methods:
+%   init (done)
+%   current_player
+%   legal_actions [0,1,2]
+%   apply_action
+%   action_to_string (optional, can by done in python)
+%   is_terminal
+%   returns
+
+% ------------------------------------------
+% interface predicates
+% init(-InitState, -Current_Player, -player0_score)
+init(state(pot(), hand(p1,), hand(p2)), Current_Player, 0) :-
+
+
+current_player() :-
+
+legal_actions() :-
+
+apply_action() :-
+
+is_terminal() :-
+
+returns() :-
+
+
+
+% ------------------------------------------
+% actual game implementation
+
 deck([1-jack, 2-queen, 3-king]).
 pot(0).
 
