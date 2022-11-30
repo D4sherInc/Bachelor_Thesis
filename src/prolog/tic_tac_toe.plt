@@ -101,4 +101,10 @@ test(move3_false, [fail]) :-
     Move = 5,
     move(Board, Player, Move, _NewBoard).
 
+test(update_legal_actions_,[setup(debug_set_legal_actions_([0,1,2,3,5,6,7])),
+                            cleanup(debug_retractall_)]) :-
+    % update_legal_actions_(5),
+    legal_actions(I),
+    \+ legal_actions([0,1,2,3,5,6,7]).
+
 :- end_tests(tic_tac_toe_tests).
