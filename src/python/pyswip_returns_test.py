@@ -11,7 +11,7 @@ tic_tac_toe = "../prolog/tic_tac_toe.pl"
 kuhn_poker = "../prolog/kuhn_poker.pl"
 iterated_prisoners_dilemma = "../prolog/iterated_prisoners_dilemma.pl"
 
-ttt_empty_board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+ttt_empty_board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
 
 class PySWIPReturnsTest(unittest.TestCase):
@@ -32,15 +32,15 @@ class PySWIPReturnsTest(unittest.TestCase):
         self.assertFalse(bool(gen1))
 
     def test_tic_tac_toe_terminal_with_winner(self):
-        gen = list(pyret.is_terminal_returns(tic_tac_toe, ["x", 0, 0, "x", 0, 0, "x", 0, 0]))
-        gen2 = list(pyret.is_terminal_returns(tic_tac_toe, [0, "o", 0, 0, "o", 0, 0, "o", 0]))
-        gen3 = list(pyret.is_terminal_returns(tic_tac_toe, ["x", 0, 0, 0, "x", 0, 0, 0, "x"]))
+        gen = list(pyret.is_terminal_returns(tic_tac_toe, [["x", 0, 0], ["x", 0, 0], ["x", 0, 0]]))
+        gen2 = list(pyret.is_terminal_returns(tic_tac_toe, [[0, "o", 0], [0, "o", 0], [0, "o", 0]]))
+        gen3 = list(pyret.is_terminal_returns(tic_tac_toe, [["x", 0, 0], [0, "x", 0], [0, 0, "x"]]))
         self.assertTrue(bool(gen))
         self.assertTrue(bool(gen2))
         self.assertTrue(bool(gen3))
 
     def test_tic_tac_toe_terminal_end_game_no_winner(self):
-        gen = list(pyret.is_terminal_returns(tic_tac_toe, ["x", "o", "x", "o", "o", "x", "x", "x", "o"]))
+        gen = list(pyret.is_terminal_returns(tic_tac_toe, [["x", "o", "x"], ["o", "o", "x"], ["x", "x", "o"]]))
         self.assertTrue(bool(gen))
 
     def test_tic_tac_toe_legal_actions_start(self):
@@ -65,7 +65,7 @@ class PySWIPReturnsTest(unittest.TestCase):
 
     def test_tic_tac_toe_apply_action(self):
         list_of_dicts = list(pyret.apply_action_returns(tic_tac_toe, 2))
-        self.assertEqual(list_of_dicts[0]["NewGameState"], [0, 0, "x", 0, 0, 0, 0, 0, 0])
+        self.assertEqual(list_of_dicts[0]["NewGameState"], [[0, 0, "x"], [0, 0, 0], [0, 0, 0]])
 
     def test_tic_tac_toe_apply_action_false(self):
         gen = pyret.apply_action_returns(tic_tac_toe, 2, 2)

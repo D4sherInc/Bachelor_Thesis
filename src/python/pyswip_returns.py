@@ -7,6 +7,13 @@ prolog = Prolog()
 def _translate_pyswip_atoms_to_python(board):
     """translate pyswip representation of values
     if pyswip atom: replace by python value"""
+    # if list of lists:
+    if isinstance(board[0], list):
+        for index, subl in enumerate(board):
+            board[index] = _translate_pyswip_atoms_to_python(subl)
+        return board
+
+    # else: just translate each element
     for index, el in enumerate(board):
         board[index] = el.value if isinstance(el, pyswip.Atom) else el
     return board
