@@ -66,7 +66,8 @@ reset_game_ :-
     retractall(current_player(_)),
     retractall(legal_actions(_)),
 
-    assert(board([[0,0,0],[0,0,0],[0,0,0]])),
+    assert(board([['.','.','.'],['.','.','.'],['.','.','.']])),
+    assert(current_player(0)),
     assert(legal_actions([0,1,2,3,4,5,6,7,8])).
 
 % translate PlayerID to symbol to play
@@ -91,7 +92,7 @@ update_legal_actions_(_, Move) :-
 
 
 wingame(Board, Player) :-
-    dif(Player, 0),
+    dif(Player, '.'),
     (win_lines(Board, Player); win_columns(Board, Player); win_diagonal(Board, Player)).
 
 win_lines([[X,X,X]|_], X) :- !.
@@ -115,12 +116,12 @@ display([Row1, Row2, Row3]) :-
 other_player(x, o) :- !.
 other_player(o, x).
 
-move([[0,B,C],[D,E,F],[G,H,I]], Player, 0, [[Player,B,C],[D,E,F],[G,H,I]]).
-move([[A,0,C],[D,E,F],[G,H,I]], Player, 1, [[A,Player,C],[D,E,F],[G,H,I]]).
-move([[A,B,0],[D,E,F],[G,H,I]], Player, 2, [[A,B,Player],[D,E,F],[G,H,I]]).
-move([[A,B,C],[0,E,F],[G,H,I]], Player, 3, [[A,B,C],[Player,E,F],[G,H,I]]).
-move([[A,B,C],[D,0,F],[G,H,I]], Player, 4, [[A,B,C],[D,Player,F],[G,H,I]]).
-move([[A,B,C],[D,E,0],[G,H,I]], Player, 5, [[A,B,C],[D,E,Player],[G,H,I]]).
-move([[A,B,C],[D,E,F],[0,H,I]], Player, 6, [[A,B,C],[D,E,F],[Player,H,I]]).
-move([[A,B,C],[D,E,F],[G,0,I]], Player, 7, [[A,B,C],[D,E,F],[G,Player,I]]).
-move([[A,B,C],[D,E,F],[G,H,0]], Player, 8, [[A,B,C],[D,E,F],[G,H,Player]]).
+move([['.',B,C],[D,E,F],[G,H,I]], Player, 0, [[Player,B,C],[D,E,F],[G,H,I]]).
+move([[A,'.',C],[D,E,F],[G,H,I]], Player, 1, [[A,Player,C],[D,E,F],[G,H,I]]).
+move([[A,B,'.'],[D,E,F],[G,H,I]], Player, 2, [[A,B,Player],[D,E,F],[G,H,I]]).
+move([[A,B,C],['.',E,F],[G,H,I]], Player, 3, [[A,B,C],[Player,E,F],[G,H,I]]).
+move([[A,B,C],[D,'.',F],[G,H,I]], Player, 4, [[A,B,C],[D,Player,F],[G,H,I]]).
+move([[A,B,C],[D,E,'.'],[G,H,I]], Player, 5, [[A,B,C],[D,E,Player],[G,H,I]]).
+move([[A,B,C],[D,E,F],['.',H,I]], Player, 6, [[A,B,C],[D,E,F],[Player,H,I]]).
+move([[A,B,C],[D,E,F],[G,'.',I]], Player, 7, [[A,B,C],[D,E,F],[G,Player,I]]).
+move([[A,B,C],[D,E,F],[G,H,'.']], Player, 8, [[A,B,C],[D,E,F],[G,H,Player]]).
