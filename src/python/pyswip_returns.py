@@ -40,6 +40,7 @@ def is_terminal_returns(game, game_state):
 def legal_actions_returns(game, *moves):
     prolog.consult(game)
     state = list(init_returns(game))[0]["InitState"]
+    state = _translate_pyswip_atoms_to_python(state)
     for move in moves:
         gen = list(prolog.query("apply_action(%s, %s, NewGameState)" % (state, move)))
         state = gen[0]["NewGameState"]
@@ -56,6 +57,7 @@ def apply_action_returns(game, *moves):
     gen = init_returns(game)
     l = list(gen)
     state = l[0]["InitState"]
+    state = _translate_pyswip_atoms_to_python(state)
     for move in moves:
         # current_player = list(prolog.query("current_player(A)"))[0]["A"]
         gen = list(prolog.query("apply_action(%s, %s, NewGameState)" % (state, move)))
