@@ -7,7 +7,7 @@ import unittest
 
 import pyswip_returns as pyret
 
-tic_tac_toe = "../prolog/tic_tac_toe.pl"
+tic_tac_toe = "../prolog/tic_tac_toe_with_saving_states.pl"
 kuhn_poker = "../prolog/kuhn_poker.pl"
 iterated_prisoners_dilemma = "../prolog/iterated_prisoners_dilemma.pl"
 
