@@ -3,15 +3,14 @@ used as bridge between Prolog definition of Tic Tac Toe
 and reinforcement learning environments and algorithms of
 OpenSpiel
 uses PySWIP to query Prolog"""
-
+import pyswip
 from pyswip import Prolog
 import pyspiel
-from pyswip import Atom
 import numpy as np
 from open_spiel.python.observation import IIGObserverForPublicInfoGame
 
 prolog = Prolog()
-prolog.consult("../prolog/tic_tac_toe.pl")
+prolog.consult("../prolog/tic_tac_toe_with_saving_states.pl")
 
 _NUM_PLAYERS = 2
 _NUM_ROWS = 3
@@ -72,36 +71,39 @@ class TicTacToeState(pyspiel.State):
     def __init__(self, game):
         super().__init__(game)
         # TODO: query empty
-        prolog.consult("../prolog/tic_tac_toe.pl")
+        prolog.consult("../prolog/tic_tac_toe_with_saving_states.pl")
         q = list(prolog.query("init(InitState, CurrentPlayer, Player0_score)"))
         query = q[0]
         self.cur_player = query["CurrentPlayer"]
         self._player0_score = query["Player0_score"]
-        self.board = query["InitState"]
-        self.is_terminal = bool(list(prolog.query("is_terminal(%s)" % self.board)))
+        prolog_board = query["InitState"]
+        self.board = translate_from_prolog(prolog_board)
+        self.terminal = bool(list(prolog.query("is_terminal")))
 
     def current_player(self):
         """return current player"""
         return self.cur_player
 
-    def legal_actions(self):
-        b = list(prolog.query("legal_actions(Legal_actions)"))[0]
-        return b["Legal_actions"]
+    def legal_actions(self, player):
+        query = list(prolog.query("legal_actions(Legal_actions)"))[0]
+        legal_actions = query["Legal_actions"]
+        return legal_actions if self.cur_player == player else []
 
     def is_terminal(self):
-        board = self.board
-        legal_actions = list(prolog.query("Board = %s, legal_actions(Board, Legal_actions)"
-                                          % board))[0]['Legal_Moves']
-        # if no more available moves: end
-        if len(legal_actions) == 0:
-            return True, "No one. Cat's game!"
-
-        win = list(prolog.query("Board = %s, wingame(Board, Player)"))
-
-        if len(win) == 0:
-            return False, "No one (yet)"
-        else:
-            return True, win[0]['Player']
+        return self.terminal
+        # board = self.board
+        # legal_actions = list(prolog.query("Board = %s, legal_actions(Board, Legal_actions)"
+        #                                   % board))[0]['Legal_Moves']
+        # # if no more available moves: end
+        # if len(legal_actions) == 0:
+        #     return True, "No one. Cat's game!"
+        #
+        # win = list(prolog.query("Board = %s, wingame(Board, Player)"))
+        #
+        # if len(win) == 0:
+        #     return False, "No one (yet)"
+        # else:
+        #     return True, win[0]['Player']
 
     def apply_action(self, move):
         """applies action to board
@@ -109,9 +111,16 @@ class TicTacToeState(pyspiel.State):
         board = self.board
         queue = list(prolog.query("Board = %s, Move = %s, apply_action(Board, Move, NewBoard)" % (board, move)))
         new_list = queue[0]
-        new_board = translate_from_prolog(new_list["NewBoard"])
+        new_board = new_list["NewBoard"]
+        if isinstance(new_board, bytes):
+            b = list(prolog.query("board(B)"))[0]["B"]
+            translate_from_prolog(b)
+            raise ValueError(b, board, new_board)
+
+        new_board = translate_from_prolog(new_board)
         self.board = new_board
         self.cur_player = 1 - self.cur_player
+        self.terminal = bool(list(prolog.query("is_terminal")))
         return new_board
 
     def get_next_player(self):
@@ -139,7 +148,7 @@ class BoardObserver:
     def __init__(self, params):
         """init an empty observation tensor"""
         if params:
-            raise ValueError(f"Observation parameters not supported; passsed {params}")
+            raise ValueError(f"Observation parameters not supported; passed {params}")
 
         shape = (1 + _NUM_PLAYERS, _NUM_ROWS, _NUM_COLS)
         self.tensor = np.zeros(np.prod(shape), np.float32)
@@ -154,8 +163,8 @@ class BoardObserver:
         obs.fill(0)
         for row in range(_NUM_ROWS):
             for col in range(_NUM_COLS):
-                b = state.board
-                cell_state = ".ox".index(state.board[row, col])
+                # state.board is list of 3x3, needs to be ndarray of 3x3
+                cell_state = ".ox".index(np.array(state.board)[row, col])
                 obs[cell_state, row, col] = 1
 
     def string_from(self, state, player):
@@ -184,7 +193,11 @@ def _board_to_string(board):
 def translate_from_prolog(l):
     """Helper method
     translate pyswip values back to pythonic values"""
-    new_l = []
-    for _, e in enumerate(l):
-        new_l.append(e.value if isinstance(e, Atom) else e)
-    return new_l
+    for list_index, list_element in enumerate(l):
+        if isinstance(list_element, list):
+            for index, el in enumerate(l):
+                l[index] = translate_from_prolog(el)
+            return l
+        for index, el in enumerate(l):
+            l[index] = el.value if isinstance(el, pyswip.Atom) else el
+        return l
