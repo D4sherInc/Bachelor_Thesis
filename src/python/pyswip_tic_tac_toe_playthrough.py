@@ -1,6 +1,4 @@
-import random
 import numpy as np
-import pyspiel
 
 from pyswip_tic_tac_toe_game import TicTacToeGame as TTTGame
 from open_spiel.python import rl_environment
@@ -20,12 +18,27 @@ flags.DEFINE_string("load_state", None,
 
 flags.DEFINE_integer("num_episodes", int(5e4), "Number of train episodes.")
 flags.DEFINE_boolean(
-    "iteractive_play", True,
-    "Whether to run an interactive play with the agent after training.")
+        "interactive_play", True,
+        "Whether to run an interactive play with the agent after training.")
 
 
-def eval_against_random_bots(env, agents, random_agents, param):
-    pass
+def eval_against_random_bots(env, agents, random_agents, num_episodes):
+    """Evaluates `trained_agents` against `random_agents` for `num_episodes`."""
+    wins = np.zeros(2)
+    for player_pos in range(2):
+        if player_pos == 0:
+            cur_agents = [agents[0], random_agents[1]]
+        else:
+            cur_agents = [random_agents[0], agents[1]]
+        for _ in range(num_episodes):
+            time_step = env.reset()
+            while not time_step.last():
+                player_id = time_step.observations["current_player"]
+                agent_output = cur_agents[player_id].step(time_step, is_evaluation=True)
+                time_step = env.step([agent_output.action])
+            if time_step.rewards[player_pos] > 0:
+                wins[player_pos] += 1
+    return wins / num_episodes
 
 
 def main(_):
@@ -52,18 +65,14 @@ def main(_):
             win_rates = eval_against_random_bots(env, agents, random_agents, 1000)
             logging.info("Starting episode %s, win_rates %s", cur_episode, win_rates)
         time_step = env.reset()
-        print(time_step)
+        while not time_step.last():
+            player_id = time_step.observations["current_player"]
+            agent_output = agents[player_id].step(time_step)
+            time_step = env.step([agent_output.action])
 
-    state = game.new_initial_state()
-    while not state.is_terminal:
-        print(str(state))
-
-        action = random.choice(state.legal_actions())
-
-        action_string = state.action_to_string(state.current_player(), action)
-        print("samples action: " + action_string)
-
-        state.apply_action(action)
+        # episode over: step all agents with final info state
+        for agent in agents:
+            agent.step(time_step)
 
     print("game finished")
 
