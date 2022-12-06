@@ -63,6 +63,13 @@ is_terminal(Board) :-
 is_terminal(Board) :-
     wingame(Board, _).
 
+% utility score
+% 0 if game is 1) not finished or 2) finished without winner
+% 1 for winner and -1 for loser if both exist
+returns(Board, Player, 1) :-
+    wingame(Board, Player), !.
+returns(_,x,0).
+
 % ------------------------------------------
 
 % internal predicate
