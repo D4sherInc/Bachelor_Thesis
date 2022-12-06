@@ -10,7 +10,6 @@ import numpy as np
 from open_spiel.python.observation import IIGObserverForPublicInfoGame
 
 prolog = Prolog()
-prolog.consult("../prolog/tic_tac_toe_with_saving_states.pl")
 
 _NUM_PLAYERS = 2
 _NUM_ROWS = 3
@@ -71,21 +70,22 @@ class TicTacToeState(pyspiel.State):
     def __init__(self, game):
         super().__init__(game)
         # TODO: query empty
-        prolog.consult("../prolog/tic_tac_toe_with_saving_states.pl")
+        prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
         q = list(prolog.query("init(InitState, CurrentPlayer, Player0_score)"))
         query = q[0]
         self.cur_player = query["CurrentPlayer"]
         self._player0_score = query["Player0_score"]
         prolog_board = query["InitState"]
         self.board = translate_from_prolog(prolog_board)
-        self.terminal = bool(list(prolog.query("is_terminal")))
+        self.terminal = False
 
     def current_player(self):
         """return current player"""
         return self.cur_player
 
     def legal_actions(self, player):
-        query = list(prolog.query("legal_actions(Legal_actions)"))[0]
+        board = self.board
+        query = list(prolog.query("legal_actions(%s, Legal_actions)" % board))[0]
         legal_actions = query["Legal_actions"]
         return legal_actions if self.cur_player == player else []
 
@@ -120,7 +120,12 @@ class TicTacToeState(pyspiel.State):
         new_board = translate_from_prolog(new_board)
         self.board = new_board
         self.cur_player = 1 - self.cur_player
-        self.terminal = bool(list(prolog.query("is_terminal")))
+        self.terminal = bool(list(prolog.query("is_terminal(%s)" % self.board)))
+        # get the winner and assert points, if there is a winner
+        if self.terminal:
+            query = list(prolog.query("returns(%s, Player, Points)" % self.board))[0]
+            points = query["Points"]
+            self._player0_score = points if query["Player"] == "x" else -points
         return new_board
 
     def get_next_player(self):
