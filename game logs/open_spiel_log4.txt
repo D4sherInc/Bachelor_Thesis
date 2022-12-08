@@ -1,0 +1,6 @@
+I1208 14:09:58.630717 140229891514368 rl_environment.py:183] Using game string: tic_tac_toe
+I1208 14:09:59.347392 140229891514368 tic_tac_toe_qlearner.py:112] Starting episode 0, win_rates [0.593 0.292]
+I1208 14:10:04.088143 140229891514368 tic_tac_toe_qlearner.py:112] Starting episode 10000, win_rates [0.972 0.684]
+I1208 14:10:08.617825 140229891514368 tic_tac_toe_qlearner.py:112] Starting episode 20000, win_rates [0.996 0.763]
+I1208 14:10:13.553388 140229891514368 tic_tac_toe_qlearner.py:112] Starting episode 30000, win_rates [0.959 0.805]
+I1208 14:10:18.415785 140229891514368 tic_tac_toe_qlearner.py:112] Starting episode 40000, win_rates [0.989 0.844]
