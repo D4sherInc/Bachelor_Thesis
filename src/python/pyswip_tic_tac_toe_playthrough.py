@@ -45,6 +45,11 @@ def main(_):
     print("trying to create a game:" + FLAGS.game)
     game = TTTGame()
 
+    logging.basicConfig(filename="mylogging.log", filemode="a",
+                        format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=logging.DEBUG)
+
     env = rl_environment.Environment(game)
     num_actions = env.action_spec()["num_actions"]
     n_players = env.num_players
@@ -74,7 +79,7 @@ def main(_):
         for agent in agents:
             agent.step(time_step)
 
-    print("game finished")
+    logging.info("game is finished")
 
 
 if __name__ == "__main__":
