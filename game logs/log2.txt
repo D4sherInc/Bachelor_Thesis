@@ -1,0 +1,9 @@
+trying to create a game:tic_tac_toe
+I1208 00:32:08.793332 140606322507776 rl_environment.py:186] Using game instance: python_tic_tac_toe
+I1208 00:33:07.492956 140606322507776 pyswip_tic_tac_toe_playthrough.py:71] Starting episode 0, win_rates [0.56  0.303]
+I1208 00:38:57.106849 140606322507776 pyswip_tic_tac_toe_playthrough.py:71] Starting episode 10000, win_rates [0.991 0.565]
+I1208 00:44:52.218316 140606322507776 pyswip_tic_tac_toe_playthrough.py:71] Starting episode 20000, win_rates [0.917 0.667]
+I1208 00:50:47.877088 140606322507776 pyswip_tic_tac_toe_playthrough.py:71] Starting episode 30000, win_rates [0.996 0.704]
+I1208 00:58:16.539641 140606322507776 pyswip_tic_tac_toe_playthrough.py:71] Starting episode 40000, win_rates [0.987 0.671]
+game finished
+
