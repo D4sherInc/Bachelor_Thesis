@@ -144,3 +144,36 @@ move([[A,B,C],[D,E,'.'],[G,H,I]], Player, 5, [[A,B,C],[D,E,Player],[G,H,I]]).
 move([[A,B,C],[D,E,F],['.',H,I]], Player, 6, [[A,B,C],[D,E,F],[Player,H,I]]).
 move([[A,B,C],[D,E,F],[G,'.',I]], Player, 7, [[A,B,C],[D,E,F],[G,Player,I]]).
 move([[A,B,C],[D,E,F],[G,H,'.']], Player, 8, [[A,B,C],[D,E,F],[G,H,Player]]).
+
+
+% ------------------------------------------
+% pyspiel GameInfo and GameType
+% saved as gametype(attrName, val)
+getGameTypes(GameType) :-
+    findall([Attr, Val], gametype(Attr, Val), GameType).
+
+getGameInfos(GameInfo) :-
+    findall([Attr, Val], gameinfo(Attr, Val), GameInfo).
+
+gametype(short_name, "prolog_tic_tac_toe").
+gametype(long_name, "Prolog Tic-Tac-Toe").
+gametype(dynamics, sequential).
+gametype(chance_mode, deterministic).
+gametype(information, perfect_information).
+gametype(utility, zero_sum).
+gametype(reward_model, terminal).
+gametype(max_num_players, 2).
+gametype(min_num_players, 2).
+gametype(provides_information_state_string, "True").
+gametype(provides_information_state_tensor, "False").
+gametype(provides_observation_string, "True").
+gametype(provides_observation_tensor, "True").
+gametype(parameter_specification, "{}").
+
+gameinfo(num_distinct_actions, 9).
+gameinfo(max_chance_outcomes, 0).
+gameinfo(num_players, 2).
+gameinfo(min_utility, -1).
+gameinfo(max_utility, 1).
+gameinfo(utility_sum, 0).
+gameinfo(max_game_length, 9).
