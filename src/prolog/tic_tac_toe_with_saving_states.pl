@@ -66,6 +66,14 @@ is_terminal(Board) :-
     wingame(Board, _),
     assert(is_terminal).
 
+returns(Points) :-
+    board(Board),
+    wingame(Board, Player),
+    !,
+    (Player == "x"
+    -> Points = [1, -1] ; Points = [-1, 1]).
+ returns([0,0]).
+
 % ------------------------------------------
 
 % internal predicate
