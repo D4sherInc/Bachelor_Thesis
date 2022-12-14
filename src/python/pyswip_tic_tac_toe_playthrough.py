@@ -67,6 +67,7 @@ def main(_):
 
     training_episodes = FLAGS.num_episodes
     for cur_episode in range(training_episodes):
+        # print(cur_episode if cur_episode % 10 == 0 else "", end="\n" if cur_episode % 500 == 0 else " ")
         if cur_episode % int(1e4) == 0:
             win_rates = eval_against_random_bots(env, agents, random_agents, 1000)
             logging.info("Starting episode %s, win_rates %s", cur_episode, win_rates)
