@@ -32,12 +32,10 @@ init(InitState, 0, 0) :-
 % remove the old GameState, save the New Game State
 % swap players (save them)
 % update legal moves by removing the one used action
-apply_action(GameState, _, "Prolog Custom Error: current GameState not the same as saved!") :-
-    \+ board(GameState), !.
-apply_action(_, Move, "Prolog Custom Error: given Move not legal!") :-
+apply_action(Move, "Prolog Custom Error: given Move not legal!") :-
     legal_actions(Legal_actions),
     \+ member(Move, Legal_actions), !.
-apply_action(GameState, Move, NewGameState) :-
+apply_action(Move, NewGameState) :-
     legal_actions(Legal_Actions),
     member(Move, Legal_Actions),
     board(GameState),
