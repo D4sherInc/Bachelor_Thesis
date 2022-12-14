@@ -1,6 +1,7 @@
 import numpy as np
 
-from pyswip_tic_tac_toe_game import TicTacToeGame as TTTGame
+from pyswip_tic_tac_toe_game_not_saving import TicTacToeGame as TTTGame_not_saving
+# from pyswip_tic_tac_toe_game_saving import TicTacToeGame as TTTGame_saving
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import random_agent
 from open_spiel.python.algorithms import tabular_qlearner
@@ -43,7 +44,7 @@ def eval_against_random_bots(env, agents, random_agents, num_episodes):
 
 def main(_):
     print("trying to create a game:" + FLAGS.game)
-    game = TTTGame()
+    game = TTTGame_not_saving()
 
     logging.basicConfig(filename="mylogging.log", filemode="a",
                         format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
