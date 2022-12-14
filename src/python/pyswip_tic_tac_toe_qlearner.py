@@ -16,7 +16,7 @@ import pyspiel
 from absl import app
 from absl import flags
 import numpy as np
-import pyswip_tic_tac_toe_game as pyswip_tic_tac_toe_game
+import pyswip_tic_tac_toe_game_not_saving as pyswip_tic_tac_toe_game
 
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import random_agent
