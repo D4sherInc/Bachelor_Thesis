@@ -1,8 +1,8 @@
 """Python file for Tic Tac Toe
-used as bridge between Prolog definition of Tic Tac Toe
-and reinforcement learning environments and algorithms of
-OpenSpiel
-uses PySWIP to query Prolog"""
+same as pyswip_tic_tac_toe_game_saving.py
+but uses the prolog definition with saving states in Prolog
+"""
+
 import pyswip
 from pyswip import Prolog
 import pyspiel
@@ -16,8 +16,8 @@ _NUM_ROWS = 3
 _NUM_COLS = 3
 _NUM_CELLS = _NUM_ROWS * _NUM_COLS
 _GAME_TYPE = pyspiel.GameType(
-        short_name="python_tic_tac_toe",
-        long_name="Python Tic-Tac-Toe",
+        short_name="prolog_tic_tac_toe",
+        long_name="Prolog Tic-Tac-Toe",
         dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
         chance_mode=pyspiel.GameType.ChanceMode.DETERMINISTIC,
         information=pyspiel.GameType.Information.PERFECT_INFORMATION,
@@ -51,7 +51,7 @@ class TicTacToeGame(pyspiel.Game):
         return TicTacToeState(self)
 
     def make_py_observer(self, iig_obs_type=None, params=None):
-        """return an object usre for observing game state"""
+        """return an object user for observing game state"""
         if ((iig_obs_type is None) or
                 (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
             return BoardObserver(params)
@@ -64,19 +64,19 @@ class TicTacToeGame(pyspiel.Game):
 
 class TicTacToeState(pyspiel.State):
     # class TicTacToeState(ProspielQuery):
-    """Query class to get results from Tic_Tac_Toe.pl
+    """Query class to get results from tic_tac_toe_without_saving_states.pl
     returns boolean for end, and the winning player as string"""
+    prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
 
     def __init__(self, game):
         super().__init__(game)
         # TODO: query empty
-        prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
         q = list(prolog.query("init(InitState, CurrentPlayer, Player0_score)"))
         query = q[0]
         self.cur_player = query["CurrentPlayer"]
         self._player0_score = query["Player0_score"]
         prolog_board = query["InitState"]
-        self.board = translate_from_prolog(prolog_board)
+        self.game_state = translate_from_prolog(prolog_board)
         self.terminal = False
 
     def current_player(self):
@@ -84,8 +84,9 @@ class TicTacToeState(pyspiel.State):
         return self.cur_player
 
     def legal_actions(self, player):
-        board = self.board
-        query = list(prolog.query("legal_actions(%s, Legal_actions)" % board))[0]
+        """get the current legal actions"""
+        gamestate = self.game_state
+        query = list(prolog.query("legal_actions(%s, Legal_actions)" % gamestate))[0]
         legal_actions = query["Legal_actions"]
         return legal_actions if self.cur_player == player else []
 
@@ -106,27 +107,28 @@ class TicTacToeState(pyspiel.State):
         #     return True, win[0]['Player']
 
     def apply_action(self, move):
-        """applies action to board
-        returns the new board"""
-        board = self.board
-        queue = list(prolog.query("Board = %s, Move = %s, apply_action(Board, Move, NewBoard)" % (board, move)))
+        """applies action to game_state
+        returns the new game_state"""
+        game_state = self.game_state
+        queue = list(prolog.query("GameState = %s, Move = %s, apply_action(GameState, Move, NewGameState)" % (
+                game_state, move)))
         new_list = queue[0]
-        new_board = new_list["NewBoard"]
-        if isinstance(new_board, bytes):
-            b = list(prolog.query("board(B)"))[0]["B"]
-            translate_from_prolog(b)
-            raise ValueError(b, board, new_board)
+        new_game_state = new_list["NewGameState"]
+        # if isinstance(new_board, bytes):
+        #     b = list(prolog.query("game_state(B)"))[0]["B"]
+        #     translate_from_prolog(b)
+        #     raise ValueError(b, game_state, new_board)
 
-        new_board = translate_from_prolog(new_board)
-        self.board = new_board
+        new_game_state = translate_from_prolog(new_game_state)
+        self.game_state = new_game_state
         self.cur_player = 1 - self.cur_player
-        self.terminal = bool(list(prolog.query("is_terminal(%s)" % self.board)))
-        # get the winner and assert points, if there is a winner
+        self.terminal = bool(list(prolog.query("is_terminal(%s)" % self.game_state)))
+        # check for winner (-> points)
         if self.terminal:
-            query = list(prolog.query("returns(%s, Player, Points)" % self.board))[0]
+            query = list(prolog.query("returns(%s, Player, Points)" % self.game_state))[0]
             points = query["Points"]
             self._player0_score = points if query["Player"] == "x" else -points
-        return new_board
+        return new_game_state
 
     def get_next_player(self):
         """returns the next player based on current stage"""
@@ -135,7 +137,7 @@ class TicTacToeState(pyspiel.State):
         return queue[0]['Next_Player'] if queue else False
 
     def __str__(self):
-        return _board_to_string(self.board)
+        return _board_to_string(self.game_state)
 
     def _action_to_string(self, player, action):
         row, col = _coordinates(action)
@@ -169,13 +171,13 @@ class BoardObserver:
         for row in range(_NUM_ROWS):
             for col in range(_NUM_COLS):
                 # state.board is list of 3x3, needs to be ndarray of 3x3
-                cell_state = ".ox".index(np.array(state.board)[row, col])
+                cell_state = ".ox".index(np.array(state.game_state)[row, col])
                 obs[cell_state, row, col] = 1
 
     def string_from(self, state, player):
         """Observation of `state` from the PoV of `player`, as a string."""
         del player
-        return _board_to_string(state.board)
+        return _board_to_string(state.game_state)
 
 
 def _coordinates(action):
