@@ -81,6 +81,10 @@ def main(_):
         for agent in agents:
             agent.step(time_step)
 
+    # final evaluation
+    win_rates = eval_against_random_bots(env, agents, random_agents, 1000)
+    logging.info("finished %s episodes. win_rates %s", training_episodes, win_rates)
+
     logging.info("game is finished")
 
 
