@@ -8,29 +8,48 @@
 
 
 % init(-InitState, -Current_player, -player0_score)
-init(InitState, Pl, 0) :-
-    start(InitState),
-    InitState = pos(Pl, _Sticks).
+init(InitState, PID, 0) :-
+    start(pos(P1, Sticks)),
+    player_ID_(PID, P1),
+    InitState = [P1, Sticks].
 
 % current_player(+GameState, -Current_player)
-current_player(pos(P1, _), P1).
+current_player([P1, _], P1).
 
 % legal_actions(+GameState, -Legal_actions)
-legal_actions(pos(_, N), [take1, take2]):-
+legal_actions([_, N], [take1, take2]):-
     dif(N, 0).
 
 % apply_action(+GameState, +Action, -NewGameState)
-apply_action(GameState, Action, NewGameState) :-
-    trans(Action, GameState, NewGameState).
+apply_action(GameState, A_ID, NewGameState) :-
+    GameState = [Current_Player, Sticks],
+    action_ID_(A_ID, Action),
+    player_ID_(Current_Player, P1),
+    game_move(pos(P1, Sticks), Action, pos(P2, NewSticks)),
+    player_ID_(Next_Player, P2),
+    NewGameState = [Next_Player, NewSticks].
 
 % is_terminal(+GameState)
-is_terminal(GameState) :-
-    win(GameState, _Winner).
+is_terminal([_, N]) :-
+    N =< 0.
 
 % returns(GameState, Player, Points)
 returns(GameState, Player, 1):-
-    win(GameState, Player), !.
+    GameState = [_, Sticks],
+    win(pos(Player, Sticks), Player), !.
+
 returns(_, min, 0).
+
+% ------------------------------------------
+% internal predicates
+% player_ID_(?Player_ID, ?Player)
+player_ID_(0, min).
+player_ID_(1, max).
+
+% action_ID_(?Action_ID, ?Action)
+action_ID_(0, take1).
+action_ID_(1, take2).
+
 
 % ------------------------------------------
 % actual game logic
