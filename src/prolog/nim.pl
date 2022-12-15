@@ -17,7 +17,7 @@ init(InitState, PID, 0) :-
 current_player([P1, _], P1).
 
 % legal_actions(+GameState, -Legal_actions)
-legal_actions([_, N], [take1, take2]):-
+legal_actions([_, N], [0, 1, 2]):-
     dif(N, 0).
 
 % apply_action(+GameState, +Action, -NewGameState)
@@ -49,6 +49,7 @@ player_ID_(1, max).
 % action_ID_(?Action_ID, ?Action)
 action_ID_(0, take1).
 action_ID_(1, take2).
+action_ID_(2, take3).
 
 
 % ------------------------------------------
@@ -65,15 +66,20 @@ game_move(pos(P1,M),take1,pos(P2,M1)) :-
     other_player(P1,P2).
 
 game_move(pos(P1,M),take2,pos(P2,M1)) :-
-    M>1,
+    M>0,
     M1 is M-2,
+    other_player(P1,P2).
+
+game_move(pos(P1,M),take3,pos(P2,M1)) :-
+    M>0,
+    M1 is M-3,
     other_player(P1,P2).
 
 player(pos(P,_B),P).
 
 
-win(pos(B,0),B).
-
+win(pos(B, N), B) :-
+    N =< 0.
 
 other_player(min, max).
 other_player(max, min).
