@@ -19,54 +19,45 @@
 % initilization of board, starting player, player0_score
 % reset by retracting (deleting) all  currently existing states
 % TODO: check for different starting players (0;1)
-init(InitState, 0, 0) :-
-    InitState = [['.','.','.'],['.','.','.'],['.','.','.']].
+init(InitState, Current_Player, 0) :-
+    Current_Player is 0,
+    InitState = [Current_Player, [['.','.','.'],['.','.','.'],['.','.','.']]].
 
-% calculate current player based on board
-current_player(Board, Current_player) :-
-    flatten(Board, FlattendBoard),
-    exclude(=('.'), FlattendBoard, L),
-    length(L, N),
-    current_player(N, Current_player, _Current_player_ID).
-current_player(9, none, -1):- !.
-current_player(N, x, 0) :-
-    0 is N mod 2, !.
-current_player(_, o, 1).
+% return current player
+current_player([_, Current_Player], Current_Player).
 
 % calculate legal actions based on board
-legal_actions(Board, Legal_actions) :-
+legal_actions(GameState, Legal_actions) :-
+    GameState = [_, Board],
     flatten(Board, FlattendBoard),
     findall(Index, nth0(Index, FlattendBoard, '.'), Legal_actions).
 
 % apply given action to given board
 % return board from next game state
 apply_action(GameState, Move, NewGameState) :-
-    catch(try_apply_action_(GameState, Move, NewGameState), Error, process_error(Error)).
-
-try_apply_action_(GameState, Move, _) :-
-    legal_actions(GameState, Legal_actions),
-    \+ member(Move, Legal_actions), !,
-    throw(illegal_action).
-
-
-try_apply_action_(GameState, Move, NewGameState) :-
-    current_player(GameState, Current_player),
-    dif(Current_player, none),
-    move(GameState, Current_player, Move, NewGameState).
-
+    GameState = [Current_Player, Board],
+    dif(Current_Player, none),
+    player_ID_(Current_Player, Pl_Symbol),
+    move(Board, Pl_Symbol, Move, NewBoard),
+    other_player(Pl_Symbol, Pl2_Symbol),
+    player_ID_(Next_Player, Pl2_Symbol),
+    NewGameState = [Next_Player, NewBoard].
 
 % calculate terminal state based on board
-is_terminal(Board) :-
+is_terminal(GameState) :-
+    GameState = [_, Board],
     flatten(Board, FlattendBoard),
     findall(I, nth0(I, FlattendBoard, '.'), []), !.
 
-is_terminal(Board) :-
+is_terminal(GameState) :-
+    GameState = [_, Board],
     wingame(Board, _).
 
 % utility score
 % 0 if game is 1) not finished or 2) finished without winner
 % 1 for winner and -1 for loser if both exist
-returns(Board, Player, 1) :-
+returns(GameState, Player, 1) :-
+    GameState = [_, Board],
     wingame(Board, Player), !.
 returns(_,x,0).
 
@@ -74,9 +65,9 @@ returns(_,x,0).
 
 % internal predicate
 
-% translate PlayerID to symbol to play
-player_(current_player(0), x).
-player_(current_player(1), o).
+% player_ID_(?ID, ?Symbol).
+player_ID_(0, x).
+player_ID_(1, o).
 
 process_error(illegal_action) :-
     write("Prolog Custom Error: given Move not legal on current board!").
