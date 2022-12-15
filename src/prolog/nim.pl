@@ -80,3 +80,32 @@ other_player(max, min).
 
 % ------------------------------------------
 % pyspiel GameType and GameInfo stuff
+getGameTypes(GameType) :-
+    findall([Attr, Val], gametype(Attr, Val), GameType).
+
+getGameInfos(GameInfo) :-
+    findall([Attr, Val], gameinfo(Attr, Val), GameInfo).
+
+gametype(short_name, "prolog_nim").
+gametype(long_name, "Prolog Nim").
+gametype(dynamics, sequential).
+gametype(chance_mode, deterministic).
+gametype(information, perfect_information).
+gametype(utility, zero_sum).
+gametype(reward_model, terminal).
+gametype(max_num_players, 2).
+gametype(min_num_players, 2).
+gametype(provides_information_state_string, "True").
+gametype(provides_information_state_tensor, "False").
+gametype(provides_observation_string, "True").
+gametype(provides_observation_tensor, "True").
+gametype(parameter_specification, "{}").
+
+gameinfo(num_distinct_actions, 3).
+gameinfo(max_chance_outcomes, 0).
+gameinfo(num_players, 2).
+gameinfo(min_utility, -1).
+gameinfo(max_utility, 1).
+gameinfo(utility_sum, 0).
+gameinfo(max_game_length, 9).
+
