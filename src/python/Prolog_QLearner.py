@@ -1,7 +1,11 @@
+"""Playthrough of a zero-sum sequential move 2 player Prolog game
+games only with Game Logic, not with saving states
+QLearner agent vs  random agent from OpenSpiel
+training for 50000 Episodes, evaluation every 10000 episodes
+supported games so far: tic_tac_toe and nim"""
 import numpy as np
 
-from pyswip_tic_tac_toe_game_not_saving import TicTacToeGame as TTTGame_not_saving
-# from pyswip_tic_tac_toe_game_saving import TicTacToeGame as TTTGame_saving
+from Prolog_Game import PrologGame as Prolog_Game
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import random_agent
 from open_spiel.python.algorithms import tabular_qlearner
@@ -43,8 +47,7 @@ def eval_against_random_bots(env, agents, random_agents, num_episodes):
 
 
 def main(_):
-    print("trying to create a game:" + FLAGS.game)
-    game = TTTGame_not_saving()
+    game = Prolog_Game()
 
     logging.basicConfig(filename="mylogging.log", filemode="a",
                         format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',

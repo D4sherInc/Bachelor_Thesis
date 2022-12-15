@@ -16,7 +16,7 @@ import pyspiel
 from absl import app
 from absl import flags
 import numpy as np
-import pyswip_tic_tac_toe_game_not_saving as pyswip_tic_tac_toe_game
+import Prolog_Game as pyswip_tic_tac_toe_game
 
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import random_agent
@@ -65,7 +65,7 @@ def main(_):
     # game = pyspiel.load_game("tic_tac_toe")
 
     # as my own pyswip game instance
-    game = pyswip_tic_tac_toe_game.TicTacToeGame()
+    game = pyswip_tic_tac_toe_game.PrologGame()
 
     num_players = 2
 

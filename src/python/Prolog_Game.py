@@ -15,45 +15,23 @@ _NUM_PLAYERS = 2
 _NUM_ROWS = 3
 _NUM_COLS = 3
 _NUM_CELLS = _NUM_ROWS * _NUM_COLS
-# _GAME_TYPE = pyspiel.GameType(
-#         short_name="prolog_tic_tac_toe",
-#         long_name="Prolog Tic-Tac-Toe",
-#         dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
-#         chance_mode=pyspiel.GameType.ChanceMode.DETERMINISTIC,
-#         information=pyspiel.GameType.Information.PERFECT_INFORMATION,
-#         utility=pyspiel.GameType.Utility.ZERO_SUM,
-#         reward_model=pyspiel.GameType.RewardModel.TERMINAL,
-#         max_num_players=_NUM_PLAYERS,
-#         min_num_players=_NUM_PLAYERS,
-#         provides_information_state_string=True,
-#         provides_information_state_tensor=False,
-#         provides_observation_string=True,
-#         provides_observation_tensor=True,
-#         parameter_specification={})
-# _GAME_INFO = pyspiel.GameInfo(
-#         num_distinct_actions=_NUM_CELLS,
-#         max_chance_outcomes=0,
-#         num_players=2,
-#         min_utility=-1.0,
-#         max_utility=1.0,
-#         utility_sum=0.0,
-#         max_game_length=_NUM_CELLS)
 
 
-class TicTacToeGame(pyspiel.Game):
+class PrologGame(pyspiel.Game):
     """A Prolog Version of Tic-Tac_Toe"""
 
     def __init__(self, params=None):
-        # prolog.consult("../prolog/nim.pl")
-        prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
+        # TODO: make decision over what game to load dynamic
+        prolog.consult("../prolog/nim.pl")
+        # prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
         gameTypes = list(prolog.query("getGameTypes(GameTypes)"))[0]["GameTypes"]
         gameInfos = list(prolog.query("getGameInfos(GameInfos)"))[0]["GameInfos"]
-        _GAME_TYPE, _GAME_INFO = assign_game_attributes_(gameTypes, gameInfos)
-        super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
+        self._GAME_TYPE, self._GAME_INFO = assign_game_attributes_(gameTypes, gameInfos)
+        super().__init__(self._GAME_TYPE, self._GAME_INFO, params or dict())
 
     def new_initial_state(self):
         """Returns a state corresponding to the start of a game"""
-        return TicTacToeState(self)
+        return PrologGameState(self)
 
     def make_py_observer(self, iig_obs_type=None, params=None):
         """return an object user for observing game state"""
@@ -67,10 +45,11 @@ class TicTacToeGame(pyspiel.Game):
         return _NUM_PLAYERS
 
 
-class TicTacToeState(pyspiel.State):
+class PrologGameState(pyspiel.State):
     # class TicTacToeState(ProspielQuery):
     """Query class to get results from tic_tac_toe_without_saving_states.pl
     returns boolean for end, and the winning player as string"""
+
     def __init__(self, game):
         super().__init__(game)
         # TODO: query empty
