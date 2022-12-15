@@ -141,7 +141,8 @@ class TicTacToeState(pyspiel.State):
         return queue[0]['Next_Player'] if queue else False
 
     def __str__(self):
-        return _board_to_string(self.game_state)
+        # return _board_to_string(self.game_state)
+        return str(self.game_state)
 
     def _action_to_string(self, player, action):
         row, col = _coordinates(action)
