@@ -15,35 +15,40 @@ _NUM_PLAYERS = 2
 _NUM_ROWS = 3
 _NUM_COLS = 3
 _NUM_CELLS = _NUM_ROWS * _NUM_COLS
-_GAME_TYPE = pyspiel.GameType(
-        short_name="prolog_tic_tac_toe",
-        long_name="Prolog Tic-Tac-Toe",
-        dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
-        chance_mode=pyspiel.GameType.ChanceMode.DETERMINISTIC,
-        information=pyspiel.GameType.Information.PERFECT_INFORMATION,
-        utility=pyspiel.GameType.Utility.ZERO_SUM,
-        reward_model=pyspiel.GameType.RewardModel.TERMINAL,
-        max_num_players=_NUM_PLAYERS,
-        min_num_players=_NUM_PLAYERS,
-        provides_information_state_string=True,
-        provides_information_state_tensor=False,
-        provides_observation_string=True,
-        provides_observation_tensor=True,
-        parameter_specification={})
-_GAME_INFO = pyspiel.GameInfo(
-        num_distinct_actions=_NUM_CELLS,
-        max_chance_outcomes=0,
-        num_players=2,
-        min_utility=-1.0,
-        max_utility=1.0,
-        utility_sum=0.0,
-        max_game_length=_NUM_CELLS)
+# _GAME_TYPE = pyspiel.GameType(
+#         short_name="prolog_tic_tac_toe",
+#         long_name="Prolog Tic-Tac-Toe",
+#         dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
+#         chance_mode=pyspiel.GameType.ChanceMode.DETERMINISTIC,
+#         information=pyspiel.GameType.Information.PERFECT_INFORMATION,
+#         utility=pyspiel.GameType.Utility.ZERO_SUM,
+#         reward_model=pyspiel.GameType.RewardModel.TERMINAL,
+#         max_num_players=_NUM_PLAYERS,
+#         min_num_players=_NUM_PLAYERS,
+#         provides_information_state_string=True,
+#         provides_information_state_tensor=False,
+#         provides_observation_string=True,
+#         provides_observation_tensor=True,
+#         parameter_specification={})
+# _GAME_INFO = pyspiel.GameInfo(
+#         num_distinct_actions=_NUM_CELLS,
+#         max_chance_outcomes=0,
+#         num_players=2,
+#         min_utility=-1.0,
+#         max_utility=1.0,
+#         utility_sum=0.0,
+#         max_game_length=_NUM_CELLS)
 
 
 class TicTacToeGame(pyspiel.Game):
     """A Prolog Version of Tic-Tac_Toe"""
 
     def __init__(self, params=None):
+        # prolog.consult("../prolog/nim.pl")
+        prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
+        gameTypes = list(prolog.query("getGameTypes(GameTypes)"))[0]["GameTypes"]
+        gameInfos = list(prolog.query("getGameInfos(GameInfos)"))[0]["GameInfos"]
+        _GAME_TYPE, _GAME_INFO = assign_game_attributes_(gameTypes, gameInfos)
         super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
 
     def new_initial_state(self):
@@ -66,8 +71,6 @@ class TicTacToeState(pyspiel.State):
     # class TicTacToeState(ProspielQuery):
     """Query class to get results from tic_tac_toe_without_saving_states.pl
     returns boolean for end, and the winning player as string"""
-    prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
-
     def __init__(self, game):
         super().__init__(game)
         # TODO: query empty
@@ -86,8 +89,11 @@ class TicTacToeState(pyspiel.State):
     def legal_actions(self, player):
         """get the current legal actions"""
         gamestate = self.game_state
-        query = list(prolog.query("legal_actions([%s, %s], Legal_actions)" % (self.cur_player, gamestate)))[0]
-        legal_actions = query["Legal_actions"]
+        query = list(prolog.query("legal_actions([%s, %s], Legal_actions)" % (self.cur_player, gamestate)))
+        if not query:
+            return []
+        l = query[0]
+        legal_actions = l["Legal_actions"]
         return legal_actions if self.cur_player == player else []
 
     def is_terminal(self):
@@ -173,6 +179,9 @@ class BoardObserver:
         # convenient than with the 1-D tensor. Both are views onto the same memory.
         obs = self.dict["observation"]
         obs.fill(0)
+        if isinstance(state.game_state, int):
+            return
+
         for row in range(_NUM_ROWS):
             for col in range(_NUM_COLS):
                 # state.board is list of 3x3, needs to be ndarray of 3x3
@@ -213,3 +222,89 @@ def translate_from_prolog(l):
         for index, el in enumerate(l):
             l[index] = el.value if isinstance(el, pyswip.Atom) else el
         return l
+
+
+def assign_game_attributes_(gameTypes, gameInfos):
+    types = {}
+    infos = {}
+
+    for attr in gameTypes:
+        match attr[0]:
+            case "short_name":
+                types.update(short_name=attr[1].decode("utf-8"))
+            case "long_name":
+                types.update(long_name=attr[1].decode("utf-8"))
+            case "dynamics":
+                match attr[1]:
+                    case "sequential":
+                        types.update(dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL)
+                    case "mean_field":
+                        types.update(dynamics=pyspiel.GameType.Dynamics.MEAN_FIELD)
+                    case "simultaneous":
+                        types.update(dynamics=pyspiel.GameType.Dynamics.SIMULTANEOUS)
+            case "chance_mode":
+                match attr[1]:
+                    case "deterministic":
+                        types.update(chance_mode=pyspiel.GameType.ChanceMode.DETERMINISTIC)
+                    case "explicit_stochastic":
+                        types.update(chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC)
+                    case "sampled_stochastic":
+                        types.update(chance_mode=pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC)
+            case "information":
+                match attr[1]:
+                    case "imperfect_information":
+                        types.update(information=pyspiel.GameType.Information.IMPERFECT_INFORMATION)
+                    case "one_shot":
+                        types.update(information=pyspiel.GameType.Information.ONE_SHOT)
+                    case "perfect_information":
+                        types.update(information=pyspiel.GameType.Information.PERFECT_INFORMATION)
+            case "utility":
+                match attr[1]:
+                    case "constant_sum":
+                        types.update(utility=pyspiel.GameType.Utility.CONSTANT_SUM)
+                    case "general_sum":
+                        types.update(utility=pyspiel.GameType.Utility.GENERAL_SUM)
+                    case "identical":
+                        types.update(utility=pyspiel.GameType.Utility.IDENTICAL)
+                    case "zero_sum":
+                        types.update(utility=pyspiel.GameType.Utility.ZERO_SUM)
+            case "reward_model":
+                match attr[1]:
+                    case "rewards":
+                        types.update(reward_model=pyspiel.GameType.RewardModel.REWARDS)
+                    case "terminal":
+                        types.update(reward_model=pyspiel.GameType.RewardModel.TERMINAL)
+            case "max_num_players":
+                types.update(max_num_players=attr[1])
+            case "min_num_players":
+                types.update(min_num_players=attr[1])
+            case "provides_information_state_string":
+                types.update(provides_information_state_string=True if attr[1].decode("utf-8") == "True" else False)
+            case "provides_information_state_tensor":
+                types.update(provides_information_state_tensor=True if attr[1].decode("utf-8") == "True" else False)
+            case "provides_observation_string":
+                types.update(provides_observation_string=True if attr[1].decode("utf-8") == "True" else False)
+            case "provides_observation_tensor":
+                types.update(provides_observation_tensor=True if attr[1].decode("utf-8") == "True" else False)
+            case "parameter_specification":
+                # TODO: check for multiple params, not just empty ones
+                types.update(parameter_specification={})
+
+    for attr in gameInfos:
+        match attr[0]:
+            case "num_distinct_actions":
+                infos.update(num_distinct_actions=attr[1])
+            case "max_chance_outcomes":
+                infos.update(max_chance_outcomes=attr[1])
+            case "num_players":
+                infos.update(num_players=attr[1])
+            case "min_utility":
+                infos.update(min_utility=float(attr[1]))
+            case "max_utility":
+                infos.update(max_utility=float(attr[1]))
+            case "utility_sum":
+                infos.update(utility_sum=float(attr[1]))
+            case "max_game_length":
+                infos.update(max_game_length=attr[1])
+
+    return pyspiel.GameType(**types), pyspiel.GameInfo(**infos)
