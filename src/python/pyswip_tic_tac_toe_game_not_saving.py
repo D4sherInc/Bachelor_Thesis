@@ -76,7 +76,7 @@ class TicTacToeState(pyspiel.State):
         self.cur_player = query["CurrentPlayer"]
         self._player0_score = query["Player0_score"]
         prolog_board = query["InitState"]
-        self.game_state = translate_from_prolog(prolog_board)
+        self.game_state = translate_from_prolog(prolog_board)[1]
         self.terminal = False
 
     def current_player(self):
@@ -110,8 +110,12 @@ class TicTacToeState(pyspiel.State):
         """applies action to game_state
         returns the new game_state"""
         game_state = self.game_state
-        queue = list(prolog.query("GameState = %s, Move = %s, apply_action(GameState, Move, NewGameState)" % (
-                game_state, move)))
+        queue = list(prolog.query("GameState = [%s, %s], Move = %s, apply_action(GameState, Move, NewGameState)" % (
+                self.cur_player, game_state, move)))
+        if not queue:
+            raise ValueError("Tried to apply_action on gamestate " + str(game_state) + " with move " + str(move) +
+                             " and prolog query failed")
+
         new_list = queue[0]
         new_game_state = new_list["NewGameState"]
         # if isinstance(new_board, bytes):
@@ -120,15 +124,15 @@ class TicTacToeState(pyspiel.State):
         #     raise ValueError(b, game_state, new_board)
 
         new_game_state = translate_from_prolog(new_game_state)
-        self.game_state = new_game_state
+        self.game_state = new_game_state[1]
         self.cur_player = 1 - self.cur_player
-        self.terminal = bool(list(prolog.query("is_terminal(%s)" % self.game_state)))
+        self.terminal = bool(list(prolog.query("is_terminal([_, %s])" % self.game_state)))
         # check for winner (-> points)
         if self.terminal:
-            query = list(prolog.query("returns(%s, Player, Points)" % self.game_state))[0]
+            query = list(prolog.query("returns([_, %s], Player, Points)" % self.game_state))[0]
             points = query["Points"]
             self._player0_score = points if query["Player"] == "x" else -points
-        return new_game_state
+        return self.game_state
 
     def get_next_player(self):
         """returns the next player based on current stage"""
