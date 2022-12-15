@@ -86,7 +86,7 @@ class TicTacToeState(pyspiel.State):
     def legal_actions(self, player):
         """get the current legal actions"""
         gamestate = self.game_state
-        query = list(prolog.query("legal_actions(%s, Legal_actions)" % gamestate))[0]
+        query = list(prolog.query("legal_actions([%s, %s], Legal_actions)" % (self.cur_player, gamestate)))[0]
         legal_actions = query["Legal_actions"]
         return legal_actions if self.cur_player == player else []
 
