@@ -11,7 +11,7 @@ from open_spiel.python.observation import IIGObserverForPublicInfoGame
 
 prolog = Prolog()
 
-_NUM_PLAYERS = 2
+# _NUM_PLAYERS = 2
 _NUM_ROWS = 3
 _NUM_COLS = 3
 _NUM_CELLS = _NUM_ROWS * _NUM_COLS
@@ -22,13 +22,19 @@ _SUPPORTED_GAMES = ["nim", "tic_tac_toe_without_saving_states"]
 class PrologGame(pyspiel.Game):
     """A Prolog Version of Tic-Tac_Toe"""
 
-    def __init__(self, params=None):
+    def __init__(self, game_string=None, params=None):
         # TODO: make decision over what game to load dynamic
-        prolog.consult("../prolog/nim.pl")
-        # prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
+        if game_string is not None:
+            prolog.consult("../prolog/%s.pl" % game_string)
+            self.game_name = game_string
+        else:
+            prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
+            self.game_name = "tic_tac_toe_without_saving_states"
+
         gameTypes = list(prolog.query("getGameTypes(GameTypes)"))[0]["GameTypes"]
         gameInfos = list(prolog.query("getGameInfos(GameInfos)"))[0]["GameInfos"]
-        self._GAME_TYPE, self._GAME_INFO = assign_game_attributes_(gameTypes, gameInfos)
+        self._GAME_TYPE, self._GAME_INFO = _assign_game_attributes(gameTypes, gameInfos)
+        self._NUM_PLAYERS = self._GAME_TYPE.max_num_players
         super().__init__(self._GAME_TYPE, self._GAME_INFO, params or dict())
 
     def new_initial_state(self):
@@ -49,7 +55,7 @@ class PrologGame(pyspiel.Game):
             return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
     def num_players(self):
-        return _NUM_PLAYERS
+        return self._NUM_PLAYERS
 
 
 class PrologGameState(pyspiel.State):
@@ -83,19 +89,6 @@ class PrologGameState(pyspiel.State):
 
     def is_terminal(self):
         return self.terminal
-        # board = self.board
-        # legal_actions = list(prolog.query("Board = %s, legal_actions(Board, Legal_actions)"
-        #                                   % board))[0]['Legal_Moves']
-        # # if no more available moves: end
-        # if len(legal_actions) == 0:
-        #     return True, "No one. Cat's game!"
-        #
-        # win = list(prolog.query("Board = %s, wingame(Board, Player)"))
-        #
-        # if len(win) == 0:
-        #     return False, "No one (yet)"
-        # else:
-        #     return True, win[0]['Player']
 
     def apply_action(self, move):
         """applies action to game_state
@@ -165,7 +158,9 @@ def translate_from_prolog(l):
         return l
 
 
-def assign_game_attributes_(gameTypes, gameInfos):
+def _assign_game_attributes(gameTypes, gameInfos):
+    """ get pyspiel.GameType and pyspiel.GameInfo arguments from Prolog game
+    return pyspiel.GameType, pyspiel.GameInfo object"""
     types = {}
     infos = {}
 

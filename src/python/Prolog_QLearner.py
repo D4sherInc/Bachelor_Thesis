@@ -5,7 +5,7 @@ training for 50000 Episodes, evaluation every 10000 episodes
 supported games so far: tic_tac_toe and nim"""
 import numpy as np
 
-from Prolog_Game import PrologGame as Prolog_Game
+from Prolog_Game import PrologGame
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import random_agent
 from open_spiel.python.algorithms import tabular_qlearner
@@ -52,6 +52,10 @@ def main(_):
                         datefmt='%H:%M:%S',
                         level=logging.DEBUG)
 
+    # input supported Game name
+    # default: tic_tac_toe
+    game = PrologGame()
+
     env = rl_environment.Environment(game)
     num_actions = env.action_spec()["num_actions"]
     n_players = env.num_players
@@ -68,7 +72,6 @@ def main(_):
 
     training_episodes = FLAGS.num_episodes
     for cur_episode in range(training_episodes):
-        # print(cur_episode if cur_episode % 10 == 0 else "", end="\n" if cur_episode % 500 == 0 else " ")
         if cur_episode % int(1e4) == 0:
             win_rates = eval_against_random_bots(env, agents, random_agents, 1000)
             logging.info("Starting episode %s, win_rates %s", cur_episode, win_rates)
