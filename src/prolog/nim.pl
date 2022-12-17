@@ -108,11 +108,14 @@ gametype(provides_observation_string, "False").
 gametype(provides_observation_tensor, "True").
 gametype(parameter_specification, "{}").
 
-gameinfo(num_distinct_actions, 3).
+gameinfo(num_distinct_actions, N) :-
+    findall(X, action_ID_(_ID, X), L),
+    length(L, N).
 gameinfo(max_chance_outcomes, 0).
 gameinfo(num_players, 2).
 gameinfo(min_utility, -1).
 gameinfo(max_utility, 1).
 gameinfo(utility_sum, 0).
-gameinfo(max_game_length, 9).
+gameinfo(max_game_length, N) :-
+    start(pos(_, N)).
 
