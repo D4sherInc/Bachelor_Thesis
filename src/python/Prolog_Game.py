@@ -6,7 +6,7 @@ but uses the prolog definition with saving states in Prolog
 import pyswip
 from pyswip import Prolog
 import pyspiel
-import numpy as np
+import Prolog_Observer
 from open_spiel.python.observation import IIGObserverForPublicInfoGame
 
 prolog = Prolog()
@@ -15,6 +15,8 @@ _NUM_PLAYERS = 2
 _NUM_ROWS = 3
 _NUM_COLS = 3
 _NUM_CELLS = _NUM_ROWS * _NUM_COLS
+
+_SUPPORTED_GAMES = ["nim", "tic_tac_toe_without_saving_states"]
 
 
 class PrologGame(pyspiel.Game):
@@ -34,10 +36,15 @@ class PrologGame(pyspiel.Game):
         return PrologGameState(self)
 
     def make_py_observer(self, iig_obs_type=None, params=None):
-        """return an object user for observing game state"""
+        """return an object user for observing game state
+        called with every observation of a state"""
         if ((iig_obs_type is None) or
                 (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
-            return BoardObserver(params)
+            match self.game_name:
+                case "tic_tac_toe_without_saving_states":
+                    return Prolog_Observer.TicTacToeObserver(params)
+                case "nim":
+                    return Prolog_Observer.NimObserver(params)
         else:
             return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
@@ -140,53 +147,9 @@ class PrologGameState(pyspiel.State):
         return False
 
 
-class BoardObserver:
-    def __init__(self, params):
-        """init an empty observation tensor"""
-        if params:
-            raise ValueError(f"Observation parameters not supported; passed {params}")
-
-        shape = (1 + _NUM_PLAYERS, _NUM_ROWS, _NUM_COLS)
-        self.tensor = np.zeros(np.prod(shape), np.float32)
-        self.dict = {"observation": np.reshape(self.tensor, shape)}
-
-    def set_from(self, state, player):
-        """Updates `tensor` and `dict` to reflect `state` from PoV of `player`."""
-        del player
-        # We update the observation via the shaped tensor since indexing is more
-        # convenient than with the 1-D tensor. Both are views onto the same memory.
-        obs = self.dict["observation"]
-        obs.fill(0)
-        if isinstance(state.game_state, int):
-            return
-
-        for row in range(_NUM_ROWS):
-            for col in range(_NUM_COLS):
-                # state.board is list of 3x3, needs to be ndarray of 3x3
-                cell_state = ".ox".index(np.array(state.game_state)[row, col])
-                obs[cell_state, row, col] = 1
-
-    def string_from(self, state, player):
-        """Observation of `state` from the PoV of `player`, as a string."""
-        del player
-        return _board_to_string(state.game_state)
-
-
 def _coordinates(action):
     return action // _NUM_COLS, action % _NUM_ROWS
     pass
-
-
-def _board_to_string(board):
-    """brings the board into a readable 3x3 representation
-    with '.' for empty fields, from '0's which is used in Prolog
-    returns board as String"""
-    r = ""
-    for index, el in enumerate(board):
-        r += "." if el == 0 else el
-        if index % 3 == 2:
-            r += "\n"
-    return r
 
 
 def translate_from_prolog(l):
