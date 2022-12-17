@@ -47,8 +47,6 @@ def eval_against_random_bots(env, agents, random_agents, num_episodes):
 
 
 def main(_):
-    game = Prolog_Game()
-
     logging.basicConfig(filename="mylogging.log", filemode="a",
                         format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                         datefmt='%H:%M:%S',

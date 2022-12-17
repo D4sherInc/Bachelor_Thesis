@@ -46,7 +46,6 @@ class PrologGame(pyspiel.Game):
 
 
 class PrologGameState(pyspiel.State):
-    # class TicTacToeState(ProspielQuery):
     """Query class to get results from tic_tac_toe_without_saving_states.pl
     returns boolean for end, and the winning player as string"""
 
@@ -116,7 +115,7 @@ class PrologGameState(pyspiel.State):
         if self.terminal:
             query = list(prolog.query("returns([_, %s], Player, Points)" % self.game_state))[0]
             points = query["Points"]
-            self._player0_score = points if query["Player"] == "x" else -points
+            self._player0_score = points if query["Player"] == 0 else -points
         return self.game_state
 
     def get_next_player(self):

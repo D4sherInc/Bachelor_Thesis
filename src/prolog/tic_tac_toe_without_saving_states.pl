@@ -56,9 +56,10 @@ is_terminal(GameState) :-
 % utility score
 % 0 if game is 1) not finished or 2) finished without winner
 % 1 for winner and -1 for loser if both exist
-returns(GameState, Player, 1) :-
+returns(GameState, Player_ID, 1) :-
     GameState = [_, Board],
-    wingame(Board, Player), !.
+    wingame(Board, Player), !,
+    player_ID_(Player_ID, Player).
 returns(_,x,0).
 
 % ------------------------------------------

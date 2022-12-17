@@ -34,9 +34,10 @@ is_terminal([_, N]) :-
     N =< 0.
 
 % returns(GameState, Player, Points)
-returns(GameState, Player, 1):-
+returns(GameState, PlayerID, 1):-
     GameState = [_, Sticks],
-    win(pos(Player, Sticks), Player), !.
+    win(pos(Player, Sticks), Player), !,
+    player_ID_(PlayerID, Player).
 
 returns(_, min, 0).
 
@@ -103,7 +104,7 @@ gametype(max_num_players, 2).
 gametype(min_num_players, 2).
 gametype(provides_information_state_string, "True").
 gametype(provides_information_state_tensor, "False").
-gametype(provides_observation_string, "True").
+gametype(provides_observation_string, "False").
 gametype(provides_observation_tensor, "True").
 gametype(parameter_specification, "{}").
 
