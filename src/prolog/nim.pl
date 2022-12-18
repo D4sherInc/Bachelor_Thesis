@@ -1,6 +1,6 @@
 :- module(nim, []).
 % ------------------------------------------
-% actual game logic
+% game logic
 
 start(pos(max,6)).
 
@@ -30,4 +30,3 @@ win(pos(B, N), B) :-
 
 other_player(min, max).
 other_player(max, min).
-

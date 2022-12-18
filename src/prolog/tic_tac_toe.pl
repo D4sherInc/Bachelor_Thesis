@@ -1,20 +1,8 @@
-% all applicable methods:
-%   init (done)
-%   current_player (done)
-%   legal_actions (done)
-%   apply_action (done with catching error: illegal move->NewGameState stays variable)
-%   action_to_string (optional, can by done in python)
-%   is_terminal
-%   returns
-
-
-% tic_tac_toe
-% zero_sum 2 player game
 :- module(tic_tac_toe, []).
 :- use_module(library(clpfd)).
 
-% ------------------------------------------
-% actual game logic
+% -----------------------------------------------------------------------------------------
+% game logic
 
 initial([['.','.','.'],['.','.','.'],['.','.','.']]).
 
@@ -51,6 +39,3 @@ move([[A,B,C],[D,E,'.'],[G,H,I]], Player, 5, [[A,B,C],[D,E,Player],[G,H,I]]).
 move([[A,B,C],[D,E,F],['.',H,I]], Player, 6, [[A,B,C],[D,E,F],[Player,H,I]]).
 move([[A,B,C],[D,E,F],[G,'.',I]], Player, 7, [[A,B,C],[D,E,F],[G,Player,I]]).
 move([[A,B,C],[D,E,F],[G,H,'.']], Player, 8, [[A,B,C],[D,E,F],[G,H,Player]]).
-
-
-
