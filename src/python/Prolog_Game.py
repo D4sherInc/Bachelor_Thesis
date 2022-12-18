@@ -47,15 +47,12 @@ class PrologGame(pyspiel.Game):
         if ((iig_obs_type is None) or
                 (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
             match self.game_name:
-                case "tic_tac_toe_bridge":
+                case "tic_tac_toe":
                     return Prolog_Observer.TicTacToeObserver(params)
                 case "nim":
                     return Prolog_Observer.NimObserver(params)
                 case "connect4":
                     return Prolog_Observer.Connect4Observer(params, self._GAME_INFO)
-
-
-
         else:
             return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
