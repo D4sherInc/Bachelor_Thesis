@@ -16,7 +16,7 @@ _NUM_ROWS = 3
 _NUM_COLS = 3
 _NUM_CELLS = _NUM_ROWS * _NUM_COLS
 
-_SUPPORTED_GAMES = ["nim", "tic_tac_toe_bridge"]
+_SUPPORTED_GAMES = ["nim", "tic_tac_toe_bridge", "connect4"]
 
 
 class PrologGame(pyspiel.Game):
@@ -51,6 +51,11 @@ class PrologGame(pyspiel.Game):
                     return Prolog_Observer.TicTacToeObserver(params)
                 case "nim":
                     return Prolog_Observer.NimObserver(params)
+                case "connect4":
+                    return Prolog_Observer.Connect4Observer(params, self._GAME_INFO)
+
+
+
         else:
             return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
