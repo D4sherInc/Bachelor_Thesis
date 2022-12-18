@@ -25,11 +25,11 @@ class PrologGame(pyspiel.Game):
     def __init__(self, game_string=None, params=None):
         # TODO: make decision over what game to load dynamic
         if game_string is not None:
-            prolog.consult("../prolog/%s.pl" % game_string)
+            prolog.consult("../prolog/%s_bridge.pl" % game_string)
             self.game_name = game_string
         else:
             prolog.consult("../prolog/tic_tac_toe_bridge.pl")
-            self.game_name = "tic_tac_toe_without_saving_states"
+            self.game_name = "tic_tac_toe"
 
         gameTypes = list(prolog.query("getGameTypes(GameTypes)"))[0]["GameTypes"]
         gameInfos = list(prolog.query("getGameInfos(GameInfos)"))[0]["GameInfos"]
