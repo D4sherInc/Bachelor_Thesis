@@ -8,10 +8,10 @@
 
 
 % init(-InitState, -Current_player, -player0_score)
-init(InitState, PID, 0) :-
+init(InitState, PID) :-
     start(pos(P1, Sticks)),
     player_ID_(PID, P1),
-    InitState = [P1, Sticks].
+    InitState = [PID, Sticks].
 
 % current_player(+GameState, -Current_player)
 current_player([P1, _], P1).
@@ -35,9 +35,10 @@ is_terminal([_, N]) :-
 
 % returns(GameState, Player, Points)
 returns(GameState, PlayerID, 1):-
-    GameState = [_, Sticks],
-    win(pos(Player, Sticks), Player), !,
-    player_ID_(PlayerID, Player).
+    GameState = [PlayerID, Sticks],
+    player_ID_(PlayerID, Player),
+    win(pos(Player, Sticks), Player), !.
+
 
 returns(_, min, 0).
 
