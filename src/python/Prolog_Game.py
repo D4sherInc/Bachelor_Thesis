@@ -70,10 +70,10 @@ class PrologGameState(pyspiel.State):
     def __init__(self, game):
         super().__init__(game)
         # TODO: query empty
-        q = list(prolog.query("init(InitState, CurrentPlayer, Player0_score)"))
+        q = list(prolog.query("init(InitState, CurrentPlayer)"))
         query = q[0]
         self.cur_player = query["CurrentPlayer"]
-        self._player0_score = query["Player0_score"]
+        self._player0_score = 0
         prolog_board = query["InitState"]
         self.game_state = translate_from_prolog(prolog_board)[1]
         self.terminal = False
