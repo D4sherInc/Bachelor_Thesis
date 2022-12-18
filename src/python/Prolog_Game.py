@@ -16,7 +16,7 @@ _NUM_ROWS = 3
 _NUM_COLS = 3
 _NUM_CELLS = _NUM_ROWS * _NUM_COLS
 
-_SUPPORTED_GAMES = ["nim", "tic_tac_toe_without_saving_states"]
+_SUPPORTED_GAMES = ["nim", "tic_tac_toe_bridge"]
 
 
 class PrologGame(pyspiel.Game):
@@ -28,7 +28,7 @@ class PrologGame(pyspiel.Game):
             prolog.consult("../prolog/%s.pl" % game_string)
             self.game_name = game_string
         else:
-            prolog.consult("../prolog/tic_tac_toe_without_saving_states.pl")
+            prolog.consult("../prolog/tic_tac_toe_bridge.pl")
             self.game_name = "tic_tac_toe_without_saving_states"
 
         gameTypes = list(prolog.query("getGameTypes(GameTypes)"))[0]["GameTypes"]
@@ -47,7 +47,7 @@ class PrologGame(pyspiel.Game):
         if ((iig_obs_type is None) or
                 (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
             match self.game_name:
-                case "tic_tac_toe_without_saving_states":
+                case "tic_tac_toe_bridge":
                     return Prolog_Observer.TicTacToeObserver(params)
                 case "nim":
                     return Prolog_Observer.NimObserver(params)
@@ -59,7 +59,7 @@ class PrologGame(pyspiel.Game):
 
 
 class PrologGameState(pyspiel.State):
-    """Query class to get results from tic_tac_toe_without_saving_states.pl
+    """Query class to get results from tic_tac_toe.pl
     returns boolean for end, and the winning player as string"""
 
     def __init__(self, game):
@@ -113,7 +113,7 @@ class PrologGameState(pyspiel.State):
         self.terminal = bool(list(prolog.query("is_terminal([_, %s])" % self.game_state)))
         # check for winner (-> points)
         if self.terminal:
-            query = list(prolog.query("returns([_, %s], Player, Points)" % self.game_state))[0]
+            query = list(prolog.query("returns([%s, %s], Player, Points)" % (self.cur_player, self.game_state)))[0]
             points = query["Points"]
             self._player0_score = points if query["Player"] == 0 else -points
         return self.game_state
