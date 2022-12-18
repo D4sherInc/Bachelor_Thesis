@@ -87,6 +87,11 @@ class NimObserver(PrologObserver):
                 cell_state = ".ox".index(np.array(state.game_state)[row, col])
                 obs[cell_state, row, col] = 1
 
+    def string_from(self, state, player):
+        """Observation of `state` from the PoV of `player`, as a string."""
+        del player
+        return _board_to_string(state.game_state)
+
 
 class Connect4Observer(PrologObserver):
     def __init__(self, params, GameInfo):
