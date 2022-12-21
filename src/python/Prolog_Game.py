@@ -11,30 +11,25 @@ from open_spiel.python.observation import IIGObserverForPublicInfoGame
 
 prolog = Prolog()
 
-# _NUM_PLAYERS = 2
-_NUM_ROWS = 3
-_NUM_COLS = 3
-_NUM_CELLS = _NUM_ROWS * _NUM_COLS
-
-_SUPPORTED_GAMES = ["nim", "tic_tac_toe_bridge", "connect4"]
 
 
 class PrologGame(pyspiel.Game):
     """A Prolog Version of Tic-Tac_Toe"""
 
+    supported_games = ["nim", "tic_tac_toe", "connect4"]
+
     def __init__(self, game_string=None, params=None):
-        # TODO: make decision over what game to load dynamic
-        if game_string is not None:
+        if game_string in self.supported_games:
             prolog.consult("../prolog/%s_bridge.pl" % game_string)
             self.game_name = game_string
         else:
-            prolog.consult("../prolog/tic_tac_toe_bridge.pl")
-            self.game_name = "tic_tac_toe"
+            raise ValueError("Missing game. Supported Games: " + game for game in self.supported_games)
 
         gameTypes = list(prolog.query("getGameTypes(GameTypes)"))[0]["GameTypes"]
         gameInfos = list(prolog.query("getGameInfos(GameInfos)"))[0]["GameInfos"]
         self._GAME_TYPE, self._GAME_INFO = _assign_game_attributes(gameTypes, gameInfos)
         self._NUM_PLAYERS = self._GAME_TYPE.max_num_players
+
         super().__init__(self._GAME_TYPE, self._GAME_INFO, params or dict())
 
     def new_initial_state(self):
@@ -69,17 +64,16 @@ class PrologGameState(pyspiel.State):
         # TODO: query empty
         q = list(prolog.query("init(InitState, CurrentPlayer)"))
         query = q[0]
+        prolog_game_state = query["InitState"]
+        self.game_state = translate_from_prolog(prolog_game_state)[1]
         self.cur_player = query["CurrentPlayer"]
         self._player0_score = 0
-        prolog_board = query["InitState"]
-        self.game_state = translate_from_prolog(prolog_board)[1]
-        self.terminal = False
 
     def current_player(self):
         """return current player"""
         return self.cur_player
 
-    def legal_actions(self, player):
+    def legal_actions(self, player=None):
         """get the current legal actions"""
         gamestate = self.game_state
         query = list(prolog.query("legal_actions([%s, %s], Legal_actions)" % (self.cur_player, gamestate)))
@@ -112,12 +106,13 @@ class PrologGameState(pyspiel.State):
         new_game_state = translate_from_prolog(new_game_state)
         self.game_state = new_game_state[1]
         self.cur_player = 1 - self.cur_player
-        self.terminal = bool(list(prolog.query("is_terminal([_, %s])" % self.game_state)))
+
         # check for winner (-> points)
-        if self.terminal:
+        if bool(list(prolog.query("is_terminal([_, %s])" % self.game_state))):
             query = list(prolog.query("returns([%s, %s], Player, Points)" % (self.cur_player, self.game_state)))[0]
             points = query["Points"]
             self._player0_score = points if query["Player"] == 0 else -points
+
         return self.game_state
 
     def get_next_player(self):
@@ -130,21 +125,12 @@ class PrologGameState(pyspiel.State):
         # return _board_to_string(self.game_state)
         return str(self.game_state)
 
-    def _action_to_string(self, player, action):
-        row, col = _coordinates(action)
-        return "{}({},{})".format("x" if player == 0 else "o", row, col)
-
     def returns(self):
         """return total rewards for current game state"""
         return [self._player0_score, -self._player0_score]
 
     def is_chance_node(self):
         return False
-
-
-def _coordinates(action):
-    return action // _NUM_COLS, action % _NUM_ROWS
-    pass
 
 
 def translate_from_prolog(l):
