@@ -84,7 +84,7 @@ class PrologGameState(pyspiel.State):
         return legal_actions if self.cur_player == player else []
 
     def is_terminal(self):
-        return self.terminal
+        return bool(list(prolog.query("is_terminal([_, %s])" % self.game_state)))
 
     def apply_action(self, move):
         """applies action to game_state
