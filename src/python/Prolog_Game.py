@@ -81,7 +81,7 @@ class PrologGameState(pyspiel.State):
             return []
         l = query[0]
         legal_actions = l["Legal_actions"]
-        return legal_actions if self.cur_player == player else []
+        return legal_actions if self.cur_player == player or player is None else []
 
     def is_terminal(self):
         return bool(list(prolog.query("is_terminal([_, %s])" % self.game_state)))
