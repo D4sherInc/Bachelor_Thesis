@@ -12,7 +12,6 @@ from open_spiel.python.observation import IIGObserverForPublicInfoGame
 prolog = Prolog()
 
 
-
 class PrologGame(pyspiel.Game):
     """A Prolog Version of Tic-Tac_Toe"""
 
@@ -37,8 +36,9 @@ class PrologGame(pyspiel.Game):
         return PrologGameState(self)
 
     def make_py_observer(self, iig_obs_type=None, params=None):
-        """return an object user for observing game state
-        called with every observation of a state"""
+        """return an object used for observing game state
+        called with every observation of a state
+        separate observer per game"""
         if ((iig_obs_type is None) or
                 (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
             match self.game_name:
@@ -69,14 +69,24 @@ class PrologGameState(pyspiel.State):
         self.cur_player = query["CurrentPlayer"]
         self._player0_score = 0
 
+    def __str__(self):
+        # return _board_to_string(self.game_state)
+        if not isinstance(self.game_state, list):
+            return str(self.game_state)
+        r = ""
+        for row in self.game_state:
+            r += str(row) + "\n"
+
+        return r
+
     def current_player(self):
         """return current player"""
         return self.cur_player
 
     def legal_actions(self, player=None):
         """get the current legal actions"""
-        gamestate = self.game_state
-        query = list(prolog.query("legal_actions([%s, %s], Legal_actions)" % (self.cur_player, gamestate)))
+        game_state = self.game_state
+        query = list(prolog.query("legal_actions([%s, %s], Legal_actions)" % (self.cur_player, game_state)))
         if not query:
             return []
         l = query[0]
@@ -93,15 +103,11 @@ class PrologGameState(pyspiel.State):
         queue = list(prolog.query("GameState = [%s, %s], Move = %s, apply_action(GameState, Move, NewGameState)" % (
                 self.cur_player, game_state, move)))
         if not queue:
-            raise ValueError("Tried to apply_action on gamestate " + str(game_state) + " with move " + str(move) +
+            raise ValueError("Tried to apply_action on game_state " + str(game_state) + " with move " + str(move) +
                              " and prolog query failed")
 
         new_list = queue[0]
         new_game_state = new_list["NewGameState"]
-        # if isinstance(new_board, bytes):
-        #     b = list(prolog.query("game_state(B)"))[0]["B"]
-        #     translate_from_prolog(b)
-        #     raise ValueError(b, game_state, new_board)
 
         new_game_state = translate_from_prolog(new_game_state)
         self.game_state = new_game_state[1]
@@ -130,6 +136,9 @@ class PrologGameState(pyspiel.State):
         return [self._player0_score, -self._player0_score]
 
     def is_chance_node(self):
+        """return if current_state is a chance_node
+        supported games so far without chance_nodes
+        method needed for environment"""
         return False
 
 
@@ -146,13 +155,13 @@ def translate_from_prolog(l):
         return l
 
 
-def _assign_game_attributes(gameTypes, gameInfos):
+def _assign_game_attributes(game_types, game_infos):
     """ get pyspiel.GameType and pyspiel.GameInfo arguments from Prolog game
     return pyspiel.GameType, pyspiel.GameInfo object"""
     types = {}
     infos = {}
 
-    for attr in gameTypes:
+    for attr in game_types:
         match attr[0]:
             case "short_name":
                 types.update(short_name=attr[1].decode("utf-8"))
@@ -214,7 +223,7 @@ def _assign_game_attributes(gameTypes, gameInfos):
                 # TODO: check for multiple params, not just empty ones
                 types.update(parameter_specification={})
 
-    for attr in gameInfos:
+    for attr in game_infos:
         match attr[0]:
             case "num_distinct_actions":
                 infos.update(num_distinct_actions=attr[1])
