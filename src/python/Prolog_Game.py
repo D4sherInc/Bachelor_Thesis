@@ -178,6 +178,10 @@ def _assign_game_attributes(game_types, game_infos):
                         types.update(dynamics=pyspiel.GameType.Dynamics.MEAN_FIELD)
                     case "simultaneous":
                         types.update(dynamics=pyspiel.GameType.Dynamics.SIMULTANEOUS)
+                    case _:
+                        raise GameSettingsError(
+                            "dynamics needs to be 'sequential', 'mean_field' or 'simultaneous', was",
+                            attr[1])
             case "chance_mode":
                 match attr[1]:
                     case "deterministic":
@@ -186,6 +190,10 @@ def _assign_game_attributes(game_types, game_infos):
                         types.update(chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC)
                     case "sampled_stochastic":
                         types.update(chance_mode=pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC)
+                    case _:
+                        raise GameSettingsError("chance_mode needs to be 'deterministic', 'explicit_stochastic' or "
+                                                "'sampled_stochastic', was", attr[1])
+
             case "information":
                 match attr[1]:
                     case "imperfect_information":
@@ -194,6 +202,9 @@ def _assign_game_attributes(game_types, game_infos):
                         types.update(information=pyspiel.GameType.Information.ONE_SHOT)
                     case "perfect_information":
                         types.update(information=pyspiel.GameType.Information.PERFECT_INFORMATION)
+                    case _:
+                        raise GameSettingsError("information needs to be 'imperfect_information', 'one_shot' or "
+                                                "'perfect_information', was", attr[1])
             case "utility":
                 match attr[1]:
                     case "constant_sum":
@@ -204,12 +215,17 @@ def _assign_game_attributes(game_types, game_infos):
                         types.update(utility=pyspiel.GameType.Utility.IDENTICAL)
                     case "zero_sum":
                         types.update(utility=pyspiel.GameType.Utility.ZERO_SUM)
+                    case _:
+                        raise GameSettingsError("utility needs to be: 'constant_sum', 'general_sum', 'identical' or "
+                                                "'zero_sum', was", attr[1])
             case "reward_model":
                 match attr[1]:
                     case "rewards":
                         types.update(reward_model=pyspiel.GameType.RewardModel.REWARDS)
                     case "terminal":
                         types.update(reward_model=pyspiel.GameType.RewardModel.TERMINAL)
+                    case _:
+                        raise GameSettingsError("reward_model needs to be 'rewards' or 'terminal', was", attr[1])
             case "max_num_players":
                 types.update(max_num_players=attr[1])
             case "min_num_players":
@@ -244,3 +260,8 @@ def _assign_game_attributes(game_types, game_infos):
                 infos.update(max_game_length=attr[1])
 
     return pyspiel.GameType(**types), pyspiel.GameInfo(**infos)
+
+
+class GameSettingsError(Exception):
+    """Raised when GameType or GameInfo attribute was wrong"""
+    pass
