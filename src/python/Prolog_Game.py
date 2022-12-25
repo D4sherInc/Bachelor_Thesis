@@ -30,6 +30,7 @@ class PrologGame(pyspiel.Game):
         self._NUM_PLAYERS = self._GAME_TYPE.max_num_players
 
         super().__init__(self._GAME_TYPE, self._GAME_INFO, params or dict())
+        pyspiel.register_game(self._GAME_TYPE, PrologGame)
 
     def new_initial_state(self):
         """Returns a state corresponding to the start of a game"""
@@ -122,14 +123,11 @@ class PrologGameState(pyspiel.State):
         return self.game_state
 
     def get_next_player(self):
-        """returns the next player based on current stage"""
+        """returns the next player based on current stage
+        only 2 player games so far"""
         cur_player = self.cur_player
         queue = list(prolog.query("Player = %s, other_player(Player, Next_Player)" % cur_player))
         return queue[0]['Next_Player'] if queue else False
-
-    def __str__(self):
-        # return _board_to_string(self.game_state)
-        return str(self.game_state)
 
     def returns(self):
         """return total rewards for current game state"""
@@ -140,6 +138,11 @@ class PrologGameState(pyspiel.State):
         supported games so far without chance_nodes
         method needed for environment"""
         return False
+
+    def action_to_string(self, player, action):
+        """returns the given action as human-readable"""
+        # TODO: implement on Prolog side
+        return str(action)
 
 
 def translate_from_prolog(l):
