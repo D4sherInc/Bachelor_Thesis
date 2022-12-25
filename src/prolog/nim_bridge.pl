@@ -21,6 +21,11 @@ apply_action(GameState, A_ID, NewGameState) :-
     player_ID_(Next_Player, P2),
     NewGameState = [Next_Player, NewSticks].
 
+apply_actions(GameState, [], GameState) :- !.
+apply_actions(GameState, [M|Oves], FinalState) :-
+    apply_action(GameState, M, NextState),
+    apply_actions(NextState, Oves, FinalState).
+
 is_terminal([_, N]) :-
     N =< 0.
 

@@ -17,6 +17,11 @@ legal_actions(GameState, Legal_actions) :-
 apply_action(GameState, Action, NewGameState) :-
     fail.
 
+apply_actions(GameState, [], GameState):- !.
+apply_actions(GameState, [M|Oves], FinalState) :-
+    apply_action(GameState, M, NextState),
+    apply_actions(NextState, Oves, FinalState).
+
 is_terminal(GameState) :-
     fail.
 

@@ -24,6 +24,11 @@ apply_action(GameState, Move, NewGameState) :-
     player_ID_(Next_Player, Pl2_Symbol),
     NewGameState = [Next_Player, NewBoard].
 
+apply_actions(GameState, [], GameState) :- !.
+apply_actions(GameState, [M|Oves], FinalState) :-
+    apply_action(GameState, M, NextState),
+    apply_actions(NextState, Oves, FinalState).
+
 is_terminal(GameState) :-
     GameState = [_, Board],
     flatten(Board, FlattendBoard),
