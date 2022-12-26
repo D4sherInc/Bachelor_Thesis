@@ -28,6 +28,10 @@ is_terminal(GameState) :-
 returns(GameState, Player, Points_for_that_Player) :-
     fail.
 
+% action_string(Player, Action, String)
+action_string(Player, Action, String) :-
+    fail.
+
 % -----------------------------------------------------------------------------------------
 % optional internal predicates
 % e.g. reassigning player names to IDs (pyspiel using IDs, prolog using ground terms like "min", "max")

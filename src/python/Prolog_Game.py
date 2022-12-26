@@ -142,19 +142,33 @@ class PrologGameState(pyspiel.State):
     def action_to_string(self, player, action):
         """returns the given action as human-readable"""
         # TODO: implement on Prolog side
-        return str(action)
+        query = list(prolog.query("action_to_string(%s, %s, Action_String)" % (player, action)))
+        action_string = query[0]["Action_String"]
+        return translate_from_prolog(action_string)
 
 
 def translate_from_prolog(l):
     """Helper method
     translate pyswip values back to pythonic values"""
-    for list_index, list_element in enumerate(l):
-        if isinstance(list_element, list):
+    if isinstance(l, list):
+        for list_index, list_element in enumerate(l):
+            if isinstance(list_element, list):
+                for index, el in enumerate(l):
+                    l[index] = translate_from_prolog(el)
+                return l
             for index, el in enumerate(l):
-                l[index] = translate_from_prolog(el)
+                if isinstance(el, pyswip.Atom):
+                    l[index] = el.value
+                elif el is bytes:
+                    l[index] = el.decode()
+                else:
+                    l[index] = el
             return l
-        for index, el in enumerate(l):
-            l[index] = el.value if isinstance(el, pyswip.Atom) else el
+    if isinstance(l, pyswip.Atom):
+        return l.value
+    elif hasattr(l, "decode"):
+        return l.decode("utf-8")
+    else:
         return l
 
 

@@ -44,6 +44,26 @@ returns(GameState, Player_ID, 1) :-
     player_ID_(Player_ID, Player).
 returns(_,x,0).
 
+% action_string(Player, Action, String)
+action_to_string(0, 0, "x(0,0)") :- !.
+action_to_string(0, 1, "x(0,1)") :- !.
+action_to_string(0, 2, "x(0,2)") :- !.
+action_to_string(0, 3, "x(1,0)") :- !.
+action_to_string(0, 4, "x(1,1)") :- !.
+action_to_string(0, 5, "x(1,2)") :- !.
+action_to_string(0, 6, "x(2,0)") :- !.
+action_to_string(0, 7, "x(2,1)") :- !.
+action_to_string(0, 8, "x(2,2)") :- !.
+action_to_string(1, 0, "o(0,0)") :- !.
+action_to_string(1, 1, "o(0,1)") :- !.
+action_to_string(1, 2, "o(0,2)") :- !.
+action_to_string(1, 3, "o(1,0)") :- !.
+action_to_string(1, 4, "o(1,1)") :- !.
+action_to_string(1, 5, "o(1,2)") :- !.
+action_to_string(1, 6, "o(2,0)") :- !.
+action_to_string(1, 7, "o(2,1)") :- !.
+action_to_string(1, 8, "o(2,2)").
+
 % -----------------------------------------------------------------------------------------
 % internal predicate
 

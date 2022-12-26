@@ -37,6 +37,13 @@ returns(GameState, PlayerID, 1):-
 
 returns(_, min, 0).
 
+% action_string(Player, Action, String)
+action_to_string(0, 0, "Player 1 takes 1") :- !.
+action_to_string(0, 1, "Player 1 takes 2") :- !.
+action_to_string(0, 2, "Player 1 takes 3") :- !.
+action_to_string(1, 0, "Player 2 takes 1") :- !.
+action_to_string(1, 1, "Player 2 takes 2") :- !.
+action_to_string(1, 2, "Player 2 takes 3").
 % -----------------------------------------------------------------------------------------
 % internal predicates
 
