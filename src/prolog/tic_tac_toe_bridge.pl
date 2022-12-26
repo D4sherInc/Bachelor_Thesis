@@ -8,8 +8,6 @@ init(InitState, Current_Player) :-
     tic_tac_toe:initial(Board),
     InitState = [Current_Player, Board].
 
-current_player([_, Current_Player], Current_Player).
-
 legal_actions(GameState, Legal_actions) :-
     GameState = [_, Board],
     flatten(Board, FlattendBoard),

@@ -8,8 +8,6 @@ init(InitState, PID) :-
     player_ID_(PID, P1),
     InitState = [PID, Sticks].
 
-current_player([P1, _], P1).
-
 legal_actions([_, N], [0, 1, 2]):-
     N >= 0.
 

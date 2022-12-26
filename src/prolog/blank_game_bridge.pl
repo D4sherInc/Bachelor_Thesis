@@ -8,9 +8,6 @@
 init(GameState, Current_Player):-
     fail.
 
-current_player(GameState, Current_Player) :-
-    fail.
-
 legal_actions(GameState, Legal_actions) :-
     fail.
 
