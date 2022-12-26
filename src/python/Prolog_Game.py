@@ -46,7 +46,7 @@ class PrologGame(pyspiel.Game):
                 case "tic_tac_toe":
                     return Prolog_Observer.TicTacToeObserver(params)
                 case "nim":
-                    return Prolog_Observer.NimObserver(params)
+                    return Prolog_Observer.NimObserver(params, self._GAME_INFO)
                 case "connect4":
                     return Prolog_Observer.Connect4Observer(params, self._GAME_INFO)
         else:
