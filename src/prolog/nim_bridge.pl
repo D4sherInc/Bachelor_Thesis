@@ -11,7 +11,7 @@ init(InitState, PID) :-
 current_player([P1, _], P1).
 
 legal_actions([_, N], [0, 1, 2]):-
-    dif(N, 0).
+    N >= 0.
 
 apply_action(GameState, A_ID, NewGameState) :-
     GameState = [Current_Player, Sticks],
