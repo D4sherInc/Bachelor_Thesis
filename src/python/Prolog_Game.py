@@ -78,6 +78,9 @@ class PrologGameState(pyspiel.State):
         for row in self.game_state:
             r += str(row) + "\n"
 
+        if list(prolog.query("gametype(short_name, SN)."))[0]["SN"] == "prolog_connect4":
+            return list(map(list, zip(*r)))
+
         return r
 
     def current_player(self):
