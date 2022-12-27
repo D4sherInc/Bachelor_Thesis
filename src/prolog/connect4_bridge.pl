@@ -43,20 +43,20 @@ returns([_, Board], Winner_ID, 1) :-
 returns(_, 'X', 0).
 
 % action_to_string(Player, Action, String)
-action_to_string(0, 0, "X to Column 0") :- !.
-action_to_string(0, 1, "X to Column 1") :- !.
-action_to_string(0, 2, "X to Column 2") :- !.
-action_to_string(0, 3, "X to Column 3") :- !.
-action_to_string(0, 4, "X to Column 4") :- !.
-action_to_string(0, 5, "X to Column 5") :- !.
-action_to_string(0, 6, "X to Column 6") :- !.
-action_to_string(1, 0, "O to Column 0") :- !.
-action_to_string(1, 1, "O to Column 1") :- !.
-action_to_string(1, 2, "O to Column 2") :- !.
-action_to_string(1, 3, "O to Column 3") :- !.
-action_to_string(1, 4, "O to Column 4") :- !.
-action_to_string(1, 5, "O to Column 5") :- !.
-action_to_string(1, 6, "O to Column 6").
+action_to_string(0, 0, "X(0)") :- !.
+action_to_string(0, 1, "X(1)") :- !.
+action_to_string(0, 2, "X(2)") :- !.
+action_to_string(0, 3, "X(3)") :- !.
+action_to_string(0, 4, "X(4)") :- !.
+action_to_string(0, 5, "X(5)") :- !.
+action_to_string(0, 6, "X(6)") :- !.
+action_to_string(1, 0, "O(0)") :- !.
+action_to_string(1, 1, "O(1)") :- !.
+action_to_string(1, 2, "O(2)") :- !.
+action_to_string(1, 3, "O(3)") :- !.
+action_to_string(1, 4, "O(4)") :- !.
+action_to_string(1, 5, "O(5)") :- !.
+action_to_string(1, 6, "O(6)").
 
 % -----------------------------------------------------------------------------------------
 % internal predicats
