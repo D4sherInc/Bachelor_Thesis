@@ -4,6 +4,7 @@ but uses the prolog definition with saving states in Prolog
 """
 
 import pyswip
+import numpy as np
 from pyswip import Prolog
 import pyspiel
 import Prolog_Observer
@@ -71,15 +72,16 @@ class PrologGameState(pyspiel.State):
         self._player0_score = 0
 
     def __str__(self):
-        # return _board_to_string(self.game_state)
         if not isinstance(self.game_state, list):
             return str(self.game_state)
-        r = ""
-        for row in self.game_state:
-            r += str(row) + "\n"
+        if translate_from_prolog(list(prolog.query("gametype(short_name, SN)."))[0]["SN"]) == "prolog_connect4":
+            tmp = np.array(self.game_state).T.tolist()
+        else:
+            tmp = self.game_state
 
-        if list(prolog.query("gametype(short_name, SN)."))[0]["SN"] == "prolog_connect4":
-            return list(map(list, zip(*r)))
+        r = ""
+        for row in tmp:
+            r += str(row) + "\n"
 
         return r
 
