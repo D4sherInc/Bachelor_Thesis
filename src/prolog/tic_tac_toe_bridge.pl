@@ -1,4 +1,5 @@
 :- use_module(tic_tac_toe, []).
+
 % -----------------------------------------------------------------------------------------
 % interface predicates
 % called by PrologGame.py
@@ -102,3 +103,66 @@ gameinfo(min_utility, -1).
 gameinfo(max_utility, 1).
 gameinfo(utility_sum, 0).
 gameinfo(max_game_length, 9).
+
+% -----------------------------------------------
+% interface tests
+% -----------------------------------------------
+
+:- use_module(library(clpfd)).
+
+:- begin_tests(tic_tac_toe_interface_tests).
+
+test(init_current_player) :-
+    init(InitState, Current_player),
+    InitState = [Current_player, Board],
+    Board = [['.','.','.'],['.','.','.'],['.','.','.']],
+    Current_player == 0.
+
+test(legal_actions1) :-
+    Board = [['x','.','o'],['.','o','.'],['x','.','.']],
+    GameState = [0, Board],
+    legal_actions(GameState, Legal_actions),
+    Legal_actions == [1,3,5,7,8].
+
+test(legalactions2) :-
+    Board = [['x','x','o'],['o','o','x'],['x','o','x']],
+    GameState = [_, Board],
+    legal_actions(GameState, Legal_actions),
+    Legal_actions == [].
+
+test(apply_action1) :-
+    Board = [['x','.','o'],['.','o','.'],['x','.','.']],
+    GameState = [0, Board],
+    apply_action(GameState, 1, NewGameState),
+    NewGameState = [_, NewBoard],
+    NewBoard == [['x','x','o'],['.','o','.'],['x','.','.']].
+
+test(apply_action2, [fail]) :-
+    Board = [['x','.','o'],['.','o','.'],['x','.','.']],
+    GameState = [0, Board],
+    apply_action(GameState, 2, _NewBoard).
+
+test(apply_action3, [fail]) :-
+    Board = [['x','x','o'],['o','o','x'],['x','x','o']],
+    GameState = [none, Board],
+    apply_action(GameState, 2, _NewBoard).
+
+test(is_terminal_no_more_moves) :-
+    Board = [['x','x','o'],['o','o','x'],['x','x','o']],
+    GameState = [_, Board],
+    is_terminal(GameState).
+
+test(is_terminal_winner) :-
+    Board = [['x','o','.'],['x','.','o'],['x','.','.']],
+    is_terminal([_, Board]).
+
+test(is_terminal_init,[fail]) :-
+    init(InitState, _),
+    is_terminal(InitState).
+
+test(is_terminal_not_finished, [fail]) :-
+    Board = [['x','o','.'],['x','.','o'],['.','.','.']],
+    is_terminal([_, Board]).
+
+
+:- end_tests(tic_tac_toe_interface_tests).
