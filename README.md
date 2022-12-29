@@ -19,7 +19,7 @@ beim allgemeinen verstärkten Lernen ("general reinforcement learning"). Dies be
 Algorithmen, Umgebungen und Spiele in C++ und Python, die als Grundlage zur Entwicklung der API dienen.
 
 
-* [PySWIP](https://github.com/yuce/pyswip): Python-Library zur Anbindung von Prolog Code. Mithilfe von PySWIP 
+* [PySwip](https://github.com/yuce/pyswip): Python-Library zur Anbindung von Prolog Code. Mithilfe von PySWIP 
 werden die in Prolog geschriebenen Spiele angesprochen und in Python anwendbar. Algorithmen und Umgebungen aus
 OpenSpiel werden vorgegeben, über PySWIP an die Prolog-Definitionen weitergegeben und über eine Query ausgewertet
 und danach wieder in einer Python-Repräsentation ausgewertet.
